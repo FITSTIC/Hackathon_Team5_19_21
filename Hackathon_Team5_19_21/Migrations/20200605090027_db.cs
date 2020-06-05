@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace Hackathon_Team5_19_21.Migrations
 {
-    public partial class Migrazione1 : Migration
+    public partial class db : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -69,7 +69,8 @@ namespace Hackathon_Team5_19_21.Migrations
                 {
                     Id = table.Column<int>(nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
-                    Nome = table.Column<string>(nullable: false)
+                    Nome = table.Column<string>(nullable: false),
+                    Sigla = table.Column<string>(nullable: false)
                 },
                 constraints: table =>
                 {
@@ -297,7 +298,7 @@ namespace Hackathon_Team5_19_21.Migrations
                         .Annotation("Sqlite:Autoincrement", true),
                     Nome = table.Column<string>(nullable: false),
                     DataInizio = table.Column<DateTime>(nullable: false),
-                    DataFine = table.Column<DateTime>(nullable: false),
+                    DataFine = table.Column<DateTime>(nullable: true),
                     Materia = table.Column<string>(nullable: false),
                     IdCorso = table.Column<int>(nullable: false),
                     IdTutor = table.Column<int>(nullable: false),
@@ -333,7 +334,7 @@ namespace Hackathon_Team5_19_21.Migrations
                     Id = table.Column<int>(nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
                     DataIscrizione = table.Column<DateTime>(nullable: false),
-                    VotoFinale = table.Column<decimal>(type: "decimal(4,2)", nullable: false),
+                    VotoFinale = table.Column<int>(nullable: false),
                     Ritirato = table.Column<bool>(nullable: false),
                     NonAmmesso = table.Column<bool>(nullable: false),
                     IdStudente = table.Column<int>(nullable: false),
@@ -362,7 +363,7 @@ namespace Hackathon_Team5_19_21.Migrations
                 {
                     Id = table.Column<int>(nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
-                    Voto = table.Column<decimal>(type: "decimal(4,2)", nullable: false),
+                    Voto = table.Column<int>(nullable: false),
                     IdModulo = table.Column<int>(nullable: false),
                     IdStudenteIscritto = table.Column<int>(nullable: false)
                 },
@@ -385,8 +386,8 @@ namespace Hackathon_Team5_19_21.Migrations
 
             migrationBuilder.InsertData(
                 table: "Province",
-                columns: new[] { "Id", "Nome" },
-                values: new object[] { 1, "Ravenna" });
+                columns: new[] { "Id", "Nome", "Sigla" },
+                values: new object[] { 1, "Ravenna", "RA" });
 
             migrationBuilder.InsertData(
                 table: "Citta",

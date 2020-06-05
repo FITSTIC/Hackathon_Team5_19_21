@@ -30,6 +30,8 @@ namespace Hackathon_Team5_19_21.Data
         [Required]
         public string Telefono { get; set; }
         [Required]
+        public DateTime DataNascita { get; set; }
+        [Required]
         public Citta Citta{get;set;}
         [Required]
         public int IdCitta { get; set; }

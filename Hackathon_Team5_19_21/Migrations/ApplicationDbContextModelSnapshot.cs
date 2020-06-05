@@ -117,8 +117,8 @@ namespace Hackathon_Team5_19_21.Migrations
                     b.Property<int>("IdStudenteIscritto")
                         .HasColumnType("INTEGER");
 
-                    b.Property<decimal>("Voto")
-                        .HasColumnType("decimal(4,2)");
+                    b.Property<int>("Voto")
+                        .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
 
@@ -135,7 +135,7 @@ namespace Hackathon_Team5_19_21.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<DateTime>("DataFine")
+                    b.Property<DateTime?>("DataFine")
                         .HasColumnType("TEXT");
 
                     b.Property<DateTime>("DataInizio")
@@ -233,6 +233,10 @@ namespace Hackathon_Team5_19_21.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("Sigla")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
                     b.HasKey("Id");
 
                     b.ToTable("Province");
@@ -241,7 +245,8 @@ namespace Hackathon_Team5_19_21.Migrations
                         new
                         {
                             Id = 1,
-                            Nome = "Ravenna"
+                            Nome = "Ravenna",
+                            Sigla = "RA"
                         });
                 });
 
@@ -316,8 +321,8 @@ namespace Hackathon_Team5_19_21.Migrations
                     b.Property<bool>("Ritirato")
                         .HasColumnType("INTEGER");
 
-                    b.Property<decimal>("VotoFinale")
-                        .HasColumnType("decimal(4,2)");
+                    b.Property<int>("VotoFinale")
+                        .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
 

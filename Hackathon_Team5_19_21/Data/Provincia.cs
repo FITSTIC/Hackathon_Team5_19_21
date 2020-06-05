@@ -13,6 +13,8 @@ namespace Hackathon_Team5_19_21.Data
         [Required]
         public string Nome { get; set; }
         [Required]
+        public string Sigla { get; set; }
+        [Required]
         public List<Citta> Citta {get;set;}
     }
 }

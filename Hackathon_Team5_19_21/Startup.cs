@@ -16,6 +16,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Hackathon_Team5_19_21.Areas.Identity;
 using Hackathon_Team5_19_21.Data;
+using Blazored.SessionStorage;
 
 namespace Hackathon_Team5_19_21
 {
@@ -40,7 +41,7 @@ namespace Hackathon_Team5_19_21
             services.AddRazorPages();
             services.AddServerSideBlazor();
             services.AddScoped<AuthenticationStateProvider, RevalidatingIdentityAuthenticationStateProvider<IdentityUser>>();
-            //services.AddSingleton<WeatherForecastService>();
+            //services.AddBlazoredSessionStorage(config =>config.JsonSerializerOptions.WriteIndented = true);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

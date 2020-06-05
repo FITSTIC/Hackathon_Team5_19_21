@@ -11,7 +11,7 @@ namespace Hackathon_Team5_19_21.Data
         [Key]
         public int Id { get; set; }
         [Required]
-        public int Voto { get; set; }
+        public int? Voto { get; set; }
         [Required]
         public Modulo Modulo{get;set;}
         [Required]

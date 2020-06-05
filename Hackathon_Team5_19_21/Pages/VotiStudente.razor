@@ -3,7 +3,7 @@
 @using Hackathon_Team5_19_21.Data
 @using Microsoft.EntityFrameworkCore
 @inject ApplicationDbContext db
-@using System.Linq;
+
 
 <h1>Voti</h1>
 
@@ -20,7 +20,7 @@ else
         <table class="table table-bordered text-center">
             <thead>
                 <tr>
-                    <th class="text-center" colspan="6">@moduloDocente.Nome @moduloDocente.DataInizio.ToShortDateString() - @moduloDocente.DataFine.Value.ToShortDateString()</th>
+                    <th class="text-center" colspan="6">@moduloDocente.Nome @moduloDocente.DataInizio.ToShortDateString() - @if (moduloDocente.DataFine.HasValue) { moduloDocente.DataFine.Value.ToShortDateString(); }</th>
                 </tr>
                 <tr>
                     <th>ID</th>
@@ -32,7 +32,7 @@ else
                 </tr>
             </thead>
             <tbody>
-                @if (votiDocente.FindAll(x=>x.IdModulo==moduloDocente.Id).Count >0)
+                @if (votiDocente.FindAll(x => x.IdModulo == moduloDocente.Id).Count > 0)
                 {
                     @foreach (var x in votiDocente.FindAll(x => x.IdModulo == moduloDocente.Id))
                     {
@@ -41,7 +41,16 @@ else
                             <td class="align-middle">@x?.Nome</td>
                             <td class="align-middle">@x?.Cognome</td>
                             <td class="align-middle"></td>
-                            <td class="align-middle" @ondblclick="(e)=>Td_DoubleClick(e)"><span class="@spanClass">@x?.Voto</span><input type="number" class="@inputClass" Value="@x?.Voto" /></td>
+                            @if (x.IsEditing == false)
+                            {
+                                <td class="align-middle" @ondblclick="(e) => Td_DoubleClick(e, x)">@x.Voto</td>
+                            }
+                            else
+                            {
+                                <td class="align-middle">
+                                    <input @bind-value="@x.Voto" @onkeyup="(e) => Input_OnKeyUp(e, x)" type="number" class="@inputClass" />
+                                </td>
+                            }
                             <td class="align-middle"><a href="dettaglio-studente/@x?.ID" class="btn btn-warning">Dettaglio</a></td>
                         </tr>
                     }
@@ -55,12 +64,6 @@ else
 @code {
     private string spanClass = "d-block";
     private string inputClass = "d-none form-control";
-    private List<Studente> studenti;
-    private List<StudenteIscritto> studentiIscritti;
-    private List<Esame> esami;
-    private List<Modulo> moduli;
-    private List<PersonaFitstic> docenti;
-    private List<Corso> corsi;
 
     private List<Modulo> moduliDocente;
 
@@ -73,42 +76,38 @@ else
         public string Cognome { get; set; }
         public int? Voto { get; set; }
         public int IdModulo { get; set; }
+        public int IdStudenteIscritto { get; set; }
+        public bool IsEditing { get; set; }
     }
 
     protected override async Task OnInitializedAsync()
     {
-        studenti = await db.Studenti.ToListAsync();
-        studentiIscritti = await db.StudentiIscritti.ToListAsync();
-        esami = await db.Esami.ToListAsync();
-        docenti = await db.PersonaleFitstic.ToListAsync();
-        moduli = await db.Moduli.ToListAsync();
-        corsi = await db.Corsi.ToListAsync();
         moduliDocente = GetModuliDocente();
         votiDocente = GetVotiDocente();
 
     }
     public List<Modulo> GetModuliDocente()
     {
-        return (from modulo in moduli
-                join docente in docenti on modulo.IdDocente equals docente.Id
+        return (from modulo in db.Moduli
+                join docente in db.PersonaleFitstic on modulo.IdDocente equals docente.Id
                 where docente.Docente == true
                 select modulo).AsQueryable().ToList();
     }
     public List<VotiDocente> GetVotiDocente()
     {
         List<VotiDocente> voti = new List<VotiDocente>();
-        var q1 = (from studente in studenti
-                  join studenteIscritto in studentiIscritti on studente.Id equals studenteIscritto.IdStudente
-                  join esame in esami on studenteIscritto.Id equals esame.IdStudenteIscritto
-                  select new VotiDocente { ID = studente.Id, Nome = studente.Nome, Cognome = studente.Cognome, Voto = esame.Voto, IdModulo = esame.IdModulo }).ToList();
+        var q1 = (from studente in db.Studenti
+                  join studenteIscritto in db.StudentiIscritti on studente.Id equals studenteIscritto.IdStudente
+                  join esame in db.Esami on studenteIscritto.Id equals esame.IdStudenteIscritto
+                  select new VotiDocente { ID = studente.Id, Nome = studente.Nome, Cognome = studente.Cognome, Voto = esame.Voto, IdModulo = esame.IdModulo, IdStudenteIscritto = studenteIscritto.Id, IsEditing = false }).ToList();
 
-        var q2 = (from studente in studenti
-                  join studenteIscritto in studentiIscritti on studente.Id equals studenteIscritto.IdStudente
-                  join corso in corsi on studenteIscritto.IdCorso equals corso.Id
-                  join modulo in moduli on corso.Id equals modulo.IdCorso
-                  select new VotiDocente { ID = studente.Id, Nome = studente.Nome, Cognome = studente.Cognome, Voto = null, IdModulo = modulo.Id }).ToList();
+        var q2 = (from studente in db.Studenti
+                  join studenteIscritto in db.StudentiIscritti on studente.Id equals studenteIscritto.IdStudente
+                  join corso in db.Corsi on studenteIscritto.IdCorso equals corso.Id
+                  join modulo in db.Moduli on corso.Id equals modulo.IdCorso
+                  select new VotiDocente { ID = studente.Id, Nome = studente.Nome, Cognome = studente.Cognome, Voto = null, IdModulo = modulo.Id, IdStudenteIscritto = studenteIscritto.Id, IsEditing = false }).ToList();
 
-        foreach(var studenteQ2 in q2)
+        foreach (var studenteQ2 in q2)
         {
             if (q1.Find(x => x.ID == studenteQ2.ID && x.IdModulo == studenteQ2.IdModulo) == null) voti.Add(studenteQ2);
             else voti.Add(q1.Find(x => x.ID == studenteQ2.ID && x.IdModulo == studenteQ2.IdModulo));
@@ -116,13 +115,39 @@ else
 
         return voti;
     }
-    public void Td_DoubleClick(EventArgs e)
+    public void Td_DoubleClick(EventArgs e, VotiDocente x)
     {
-        Console.WriteLine(e.ToString());
+        x.IsEditing = true;
         if (spanClass == "d-block")
         {
             spanClass = "d-none";
             inputClass = "d-block form-control";
+        }
+    }
+    public void Input_OnKeyUp(KeyboardEventArgs e, VotiDocente x)
+    {
+        if (e.Key == "Enter" && x.Voto >= 0 && x.Voto <= 100)
+        {
+            var q1 = (from studente in db.Studenti
+                      join studenteIscritto in db.StudentiIscritti on studente.Id equals studenteIscritto.IdStudente
+                      join esame in db.Esami on studenteIscritto.Id equals esame.IdStudenteIscritto
+                      where studente.Id == x.ID && esame.IdModulo == x.IdModulo
+                      select esame).ToList();
+            if (q1.Count == 0) db.Esami.Add(new Esame { IdModulo = x.IdModulo, Voto = x.Voto, IdStudenteIscritto = x.IdStudenteIscritto });
+            else q1[0].Voto = x.Voto;
+
+            db.SaveChanges();
+
+            if (spanClass == "d-none")
+            {
+                spanClass = "d-block";
+                inputClass = "d-none form-control";
+            }
+            x.IsEditing = false;
+        }
+        else if(e.Key == "Enter" && (x.Voto < 0 || x.Voto > 100))
+        {
+            inputClass = "d-block form-control btn-outline-danger bg-white text-dark";
         }
     }
 }

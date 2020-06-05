@@ -1,0 +1,58 @@
+﻿@page "/moduli"
+
+@using Hackathon_Team5_19_21.Data
+@using Microsoft.EntityFrameworkCore
+@inject ApplicationDbContext db
+
+<h1>Moduli</h1>
+
+<p>Visualizza i moduli</p>
+
+@if (moduli == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table table-bordered text-center">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Nome</th>
+                <th>Data Inizio</th>
+                <th>Data Fine</th>
+                <th>Materia</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var modulo in moduli)
+            {
+                <tr>
+                    <td>@modulo.Id</td>
+                    <td>@modulo.Nome</td>
+                    <td>@modulo.DataInizio</td>
+                    @if (modulo.DataFine.HasValue)
+                    {
+                        <td>@modulo.DataFine.Value.ToShortDateString()</td>
+                    }
+                    else
+                    {
+                        <td>In Corso</td>
+                    }
+                    <td>@modulo.Materia</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+@code {
+    List<Modulo> moduli;
+
+    protected async override Task OnInitializedAsync()
+    {
+        moduli = (from modulo in db.Moduli
+                  join docente in db.PersonaleFitstic on modulo.IdDocente equals docente.Id
+                  where docente.Docente == true
+                  select modulo).AsQueryable().ToList();
+    }
+}
