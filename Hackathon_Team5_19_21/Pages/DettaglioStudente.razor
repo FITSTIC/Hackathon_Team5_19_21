@@ -1,0 +1,52 @@
+﻿@page "/dettaglio-studente/{IdStudente}"
+
+@using Hackathon_Team5_19_21.Data
+@using Microsoft.EntityFrameworkCore
+@inject ApplicationDbContext db
+@using System.Linq;
+
+<h1>Weather forecast</h1>
+
+<p>This component demonstrates fetching data from a service.</p>
+
+@if (studente == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Nome</th>
+                <th>Cognome</th>
+                <th>Email</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>@studente.Id</td>
+                <td>@studente.Nome</td>
+                <td>@studente.Cognome</td>
+                <td>@studente.Email</td>
+            </tr>
+        </tbody>
+
+    </table>
+}
+
+@code {
+    [Parameter]
+    public string IdStudente { get; set; }
+    public Studente studente;
+
+    protected override async Task OnInitializedAsync()
+    {
+        int id;
+        bool ok = int.TryParse(IdStudente, out id);
+        if (int.TryParse(IdStudente, out id)) studente = await db.Studenti.FindAsync(id);
+        
+    }
+}
