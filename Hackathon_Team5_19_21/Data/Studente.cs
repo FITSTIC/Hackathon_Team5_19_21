@@ -23,9 +23,11 @@ namespace Hackathon_Team5_19_21.Data
         public TipoDiploma TipoDiploma { get; set; }
         [Required]
         public int AnnoDiploma { get; set; }
-        [Required]
+        [Required(ErrorMessage ="Il campo email è obbligatorio")]
+        [DataType(DataType.EmailAddress,ErrorMessage ="Inserire un indirizzo email valido")]
         public string Email { get; set; }
         [Required]
+        [DataType(DataType.Password)]
         public string Password { get; set; }
         [Required]
         public string Telefono { get; set; }

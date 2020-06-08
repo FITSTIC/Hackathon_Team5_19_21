@@ -20,11 +20,9 @@ namespace Hackathon_Team5_19_21.Data
         public Citta Citta { get; set; }
         [Required]
         public int IdCitta { get; set; }
-        [Required]
         public PersonaFitstic Organizzatore {get;set;}
         [Required]
         public int IdOrganizzatore { get; set; }
-        [Required]
         public List<StudenteIscritto> StudentiIscritti{get;set;}
         public List<Modulo> Moduli{get;set;}
     }

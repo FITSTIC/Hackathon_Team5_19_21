@@ -11,6 +11,7 @@ namespace Hackathon_Team5_19_21.Data
         [Key]
         public int Id { get; set; }
         [Required]
+        [Range(0,100,ErrorMessage ="Il voto non può essere minore di 0 o maggiore di 100")]
         public int? Voto { get; set; }
         [Required]
         public Modulo Modulo{get;set;}

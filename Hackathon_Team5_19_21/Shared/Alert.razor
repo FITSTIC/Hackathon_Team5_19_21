@@ -1,0 +1,53 @@
+﻿@if (IsVisible)
+{
+    @switch (Type)
+    {
+        case TypeMessage.Danger:
+            Classe = "danger";
+            break;
+        case TypeMessage.Warning:
+            Classe = "warning";
+            break;
+        case TypeMessage.Success:
+            Classe = "success";
+            break;
+        case TypeMessage.Primary:
+            Classe = "primary";
+            break;
+        case TypeMessage.Info:
+            Classe = "info";
+            break;
+        case TypeMessage.Dark:
+            Classe = "dark";
+            break;
+        case TypeMessage.Secondary:
+            Classe = "secondary";
+            break;
+        case TypeMessage.Light:
+            Classe = "light";
+            break;
+    }
+    <div class="alert alert-@Classe" role="alert">
+        @ChildContent
+        <button type="button" class="close" @onclick="()=>Chiudi()" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+}
+
+@code {
+    public enum TypeMessage { Danger, Warning, Success, Primary, Secondary, Info, Light, Dark }
+    [Parameter]
+    public TypeMessage Type { get; set; }
+    [Parameter]
+    public bool IsVisible { get; set; }
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+
+    string Classe = "";
+
+    public void Chiudi()
+    {
+        IsVisible = false;
+    }
+}

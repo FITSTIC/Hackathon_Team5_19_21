@@ -9,8 +9,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Hackathon_Team5_19_21.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20200605090027_db")]
-    partial class db
+    [Migration("20200606133207_db1")]
+    partial class db1
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -66,14 +66,6 @@ namespace Hackathon_Team5_19_21.Migrations
                     b.HasIndex("IdProvincia");
 
                     b.ToTable("Citta");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            IdProvincia = 1,
-                            Nome = "Cervia"
-                        });
                 });
 
             modelBuilder.Entity("Hackathon_Team5_19_21.Data.Corso", b =>
@@ -119,7 +111,8 @@ namespace Hackathon_Team5_19_21.Migrations
                     b.Property<int>("IdStudenteIscritto")
                         .HasColumnType("INTEGER");
 
-                    b.Property<int>("Voto")
+                    b.Property<int?>("Voto")
+                        .IsRequired()
                         .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
@@ -242,14 +235,6 @@ namespace Hackathon_Team5_19_21.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Province");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Nome = "Ravenna",
-                            Sigla = "RA"
-                        });
                 });
 
             modelBuilder.Entity("Hackathon_Team5_19_21.Data.Studente", b =>
@@ -267,6 +252,9 @@ namespace Hackathon_Team5_19_21.Migrations
 
                     b.Property<string>("Cognome")
                         .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("DataNascita")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Email")

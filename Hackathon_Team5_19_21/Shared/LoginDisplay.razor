@@ -1,12 +1,24 @@
-﻿<AuthorizeView>
+﻿@inject AuthenticationStateProvider AuthenticationStateProvider
+
+<AuthorizeView>
     <Authorized>
         <a href="Identity/Account/Manage">Hello, @context.User.Identity.Name!</a>
-        <form method="post" action="Identity/Account/LogOut">
+        <a href="/login" @onclick="()=>Logout()">Logout</a>
+        @*<form method="post" action="Identity/Account/LogOut">
             <button type="submit" class="nav-link btn btn-link">Log out</button>
-        </form>
+        </form>*@
     </Authorized>
     <NotAuthorized>
         <a href="Identity/Account/Register">Register</a>
-        <a href="Identity/Account/Login">Log in</a>
+        @*<a href="Identity/Account/Login">Log in</a>*@
+        <a href="/login">Login</a>
     </NotAuthorized>
 </AuthorizeView>
+
+@code{
+    private async Task Logout()
+    {
+        await ((Hackathon_Team5_19_21.Data.CustomAuthenticationStateProvider)AuthenticationStateProvider).MarkUserAsLoggedout();
+    }
+
+}

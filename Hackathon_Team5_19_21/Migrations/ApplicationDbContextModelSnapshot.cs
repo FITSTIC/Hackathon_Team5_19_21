@@ -64,14 +64,6 @@ namespace Hackathon_Team5_19_21.Migrations
                     b.HasIndex("IdProvincia");
 
                     b.ToTable("Citta");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            IdProvincia = 1,
-                            Nome = "Cervia"
-                        });
                 });
 
             modelBuilder.Entity("Hackathon_Team5_19_21.Data.Corso", b =>
@@ -117,7 +109,8 @@ namespace Hackathon_Team5_19_21.Migrations
                     b.Property<int>("IdStudenteIscritto")
                         .HasColumnType("INTEGER");
 
-                    b.Property<int>("Voto")
+                    b.Property<int?>("Voto")
+                        .IsRequired()
                         .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
@@ -240,14 +233,6 @@ namespace Hackathon_Team5_19_21.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Province");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Nome = "Ravenna",
-                            Sigla = "RA"
-                        });
                 });
 
             modelBuilder.Entity("Hackathon_Team5_19_21.Data.Studente", b =>
@@ -265,6 +250,9 @@ namespace Hackathon_Team5_19_21.Migrations
 
                     b.Property<string>("Cognome")
                         .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("DataNascita")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Email")

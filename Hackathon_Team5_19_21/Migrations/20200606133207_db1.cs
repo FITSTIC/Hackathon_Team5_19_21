@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace Hackathon_Team5_19_21.Migrations
 {
-    public partial class db : Migration
+    public partial class db1 : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -277,6 +277,7 @@ namespace Hackathon_Team5_19_21.Migrations
                     Email = table.Column<string>(nullable: false),
                     Password = table.Column<string>(nullable: false),
                     Telefono = table.Column<string>(nullable: false),
+                    DataNascita = table.Column<DateTime>(nullable: false),
                     IdCitta = table.Column<int>(nullable: false)
                 },
                 constraints: table =>
@@ -383,16 +384,6 @@ namespace Hackathon_Team5_19_21.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
-
-            migrationBuilder.InsertData(
-                table: "Province",
-                columns: new[] { "Id", "Nome", "Sigla" },
-                values: new object[] { 1, "Ravenna", "RA" });
-
-            migrationBuilder.InsertData(
-                table: "Citta",
-                columns: new[] { "Id", "IdProvincia", "Nome" },
-                values: new object[] { 1, 1, "Cervia" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",

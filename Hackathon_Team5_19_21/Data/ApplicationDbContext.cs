@@ -98,13 +98,6 @@ namespace Hackathon_Team5_19_21.Data
             .WithMany(b => b.ModuliTutor)
             .HasForeignKey(p => p.IdTutor)
             .HasConstraintName("ForeignKey_Modulo_Tutor").OnDelete(DeleteBehavior.Restrict);
-
-            modelBuilder.Entity<Provincia>().HasData(
-                new Provincia { Id = 1, Nome = "Ravenna", Sigla="RA" }
-                );
-            modelBuilder.Entity<Citta>().HasData(
-                new Citta { Id = 1, Nome = "Cervia", IdProvincia = 1 }
-                );
         }
     }
 }

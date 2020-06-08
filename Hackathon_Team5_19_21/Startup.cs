@@ -17,6 +17,7 @@ using Microsoft.Extensions.Hosting;
 using Hackathon_Team5_19_21.Areas.Identity;
 using Hackathon_Team5_19_21.Data;
 using Blazored.SessionStorage;
+using System.Net.Http;
 
 namespace Hackathon_Team5_19_21
 {
@@ -40,8 +41,11 @@ namespace Hackathon_Team5_19_21
                 .AddEntityFrameworkStores<ApplicationDbContext>();
             services.AddRazorPages();
             services.AddServerSideBlazor();
-            services.AddScoped<AuthenticationStateProvider, RevalidatingIdentityAuthenticationStateProvider<IdentityUser>>();
-            //services.AddBlazoredSessionStorage(config =>config.JsonSerializerOptions.WriteIndented = true);
+            //services.AddScoped<AuthenticationStateProvider, RevalidatingIdentityAuthenticationStateProvider<IdentityUser>>();
+            services.AddScoped<AuthenticationStateProvider, CustomAuthenticationStateProvider>();
+            services.AddSingleton<IServizioModuli, ServizioModuli>();
+            services.AddSingleton<IServizioPersonaleFitstic, ServizioPersonaleFitstic>();
+            services.AddBlazoredSessionStorage();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

@@ -10,14 +10,13 @@ namespace Hackathon_Team5_19_21.Data
     {
         [Key]
         public int Id { get; set; }
-        [Required]
+        [Required(ErrorMessage ="Il nome è obbligatorio")]
         public string Nome { get; set; }
         [Required]
         public DateTime DataInizio { get; set; }
         public DateTime? DataFine { get; set; }
         [Required]
         public string Materia{get;set;}
-        [Required]
         public Corso Corso{get;set;}
         [Required]
         public int IdCorso { get; set; }
@@ -25,7 +24,6 @@ namespace Hackathon_Team5_19_21.Data
         public int IdTutor { get; set; }
         public PersonaFitstic Docente { get; set; }
         public int IdDocente { get; set; }
-        [Required]
         public List<Esame> Esami{get;set;}
     }
 }
