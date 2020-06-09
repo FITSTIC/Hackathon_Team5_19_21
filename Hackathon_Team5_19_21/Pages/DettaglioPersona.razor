@@ -1,0 +1,151 @@
+﻿@page "/personale/create"
+@page "/personale/view/{Id:int}"
+
+@inject IServizioPersonaleFitstic ServizioPersonaleFitstic
+@inject ApplicationDbContext db
+@inject Blazored.SessionStorage.ISessionStorageService sessionStorage
+<h1>Personale</h1>
+@if (Id == null)
+{
+    <p>Aggiungi un nuovo dipendente</p>
+}
+else
+{
+    <p>Modifica dipendente</p>
+}
+
+<div class="container">
+    <EditForm Model="@Persona" OnValidSubmit="()=>Form_OnSubmit()">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+        <div class="input-group mb-3">
+            <div class="input-group-prepend">
+                <span class="input-group-text">Nome</span>
+            </div>
+            <InputText class="form-control" @bind-Value="Persona.Nome" required></InputText>
+        </div>
+        <div class="input-group mb-3">
+            <div class="input-group-prepend">
+                <span class="input-group-text">Cognome</span>
+            </div>
+            <InputText class="form-control" @bind-Value="Persona.Cognome" required></InputText>
+        </div>
+        <div class="input-group mb-3">
+            <div class="input-group-prepend">
+                <span class="input-group-text">Data Nascita</span>
+            </div>
+            <InputDate class="form-control" @bind-Value="Persona.DataNascita" required></InputDate>
+        </div>
+        <div class="input-group mb-3">
+            <div class="input-group-prepend">
+                <span class="input-group-text">Data Assunzione</span>
+            </div>
+            <InputDate class="form-control" @bind-Value="Persona.DataAssunzione" required></InputDate>
+        </div>
+        <div class="input-group mb-3">
+            <div class="input-group-prepend">
+                <span class="input-group-text">Ruoli</span>
+            </div>
+            <div class="form-control h-auto d-flex flex-column flex-sm-row justify-content-around">
+                <div class="custom-control custom-checkbox">
+                    <InputCheckbox class="custom-control-input" id="ckb1" @bind-Value="Persona.Docente"></InputCheckbox>
+                    <label class="custom-control-label" for="ckb1">Docente</label>
+                </div>
+                <div class="custom-control custom-checkbox">
+                    <InputCheckbox class="custom-control-input" id="ckb2" @bind-Value="Persona.Organizzatore"></InputCheckbox>
+                    <label class="custom-control-label" for="ckb2">Organizzatore</label>
+                </div>
+                <div class="custom-control custom-checkbox">
+                    <InputCheckbox class="custom-control-input" id="ckb3" @bind-Value="Persona.Tutor"></InputCheckbox>
+                    <label class="custom-control-label" for="ckb3">Tutor</label>
+                </div>
+            </div>
+        </div>
+        <div class="input-group mb-3">
+            <div class="input-group-prepend">
+                <span class="input-group-text">Email</span>
+            </div>
+            <InputText type="email" class="form-control" @bind-Value="Persona.Email" required></InputText>
+        </div>
+        <div class="input-group mb-3">
+            <div class="input-group-prepend">
+                <span class="input-group-text">Password</span>
+            </div>
+            <InputText class="form-control" @bind-Value="Persona.Password" required></InputText>
+        </div>
+        <div class="input-group mb-3">
+            <div class="input-group-prepend">
+                <span class="input-group-text">Prima Password</span>
+            </div>
+            <div class="form-control h-auto d-flex flex-column flex-sm-row justify-content-around">
+                <div class="custom-control custom-radio">
+                    @if (Persona.PrimaPassword)
+                    {
+                        <input type="radio" name="radioPrimaPassword" checked class="custom-control-input" id="r1" @onchange="(e)=>PrimaPassword_OnChange(e)" />
+                    }
+                    else
+                    {
+                        <input type="radio" name="radioPrimaPassword" class="custom-control-input" id="r1" @onchange="(e)=>PrimaPassword_OnChange(e)" />
+                    }
+                    <label class="custom-control-label" for="r1">Sì</label>
+                </div>
+                <div class="custom-control custom-radio">
+                    @if (Persona.PrimaPassword)
+                    {
+                        <input type="radio" name="radioPrimaPassword" class="custom-control-input" id="r2" />
+                    }
+                    else
+                    {
+                        <input type="radio" name="radioPrimaPassword" class="custom-control-input" id="r2" checked />
+                    }
+                    <label class="custom-control-label" for="r2">No</label>
+                </div>
+            </div>
+        </div>
+        <div class="input-group mb-3">
+            <div class="input-group-prepend">
+                <span class="input-group-text">Telefono</span>
+            </div>
+            <InputText class="form-control" @bind-Value="Persona.Telefono" required></InputText>
+        </div>
+        <div class="text-right">
+            <a href="/personale" class="btn btn-secondary">Annulla</a>
+            <button type="submit" class="btn btn-success">Salva</button>
+        </div>
+    </EditForm>
+</div>
+
+@code {
+    [Parameter]
+    public int? Id { get; set; }
+    public PersonaFitstic Persona { get; set; }
+
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationStateTask { get; set; }
+
+    protected async override Task OnInitializedAsync()
+    {
+        var user = (await authenticationStateTask).User;
+        if (user.Identity.IsAuthenticated)
+        {
+            var admin = await db.Amministratori.FirstAsync(x => x.Email == user.Identity.Name);
+            Persona = Id == null ? new PersonaFitstic { DataNascita = DateTime.Now, DataAssunzione = DateTime.Now, PrimaPassword = true, IdAmministratore = admin.Id } : await db.PersonaleFitstic.FindAsync(Id);
+        }
+        else NavigationManager.NavigateTo("/");
+    }
+    protected async Task Form_OnSubmit()
+    {
+        if (Id == null) await ServizioPersonaleFitstic.SalvaPersona(db, Persona);
+        else
+        {
+            if (Persona.PrimaPassword) Persona.Password = Persona.Password.Sha256();
+            if (await ServizioPersonaleFitstic.ControllaRuoli(db, Persona)) await db.SaveChangesAsync();
+        }
+        StateHasChanged();
+        NavigationManager.NavigateTo("/personale");
+    }
+    protected void PrimaPassword_OnChange(ChangeEventArgs e)
+    {
+        Persona.PrimaPassword = e.Value.ToString() == "on";
+    }
+}

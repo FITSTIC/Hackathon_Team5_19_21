@@ -5,7 +5,9 @@
 @inject ApplicationDbContext db
 @inject IServizioModuli ServizioModuli
 @inject IServizioPersonaleFitstic ServizioPersonaleFitstic
+@inject IServizioCorsi ServizioCorsi
 @inject Blazored.SessionStorage.ISessionStorageService sessionStorage
+@inject IJSRuntime JSRuntime
 
 <h1>Moduli</h1>
 
@@ -17,219 +19,66 @@
 }
 else
 {
-    <div class="container">
-        <EditForm Model="@NuovoModulo" OnValidSubmit="()=>Form_OnSubmit()">
-            <DataAnnotationsValidator />
-            <ValidationSummary />
-            <div class="form-group">
-                <label>Nome</label>
-                <InputText class="form-control" @bind-Value="NuovoModulo.Nome"></InputText>
-            </div>
-            <div class="form-group">
-                <label>Data Inizio</label>
-                <InputDate class="form-control" @bind-Value="NuovoModulo.DataInizio"></InputDate>
-            </div>
-            <div class="form-group">
-                <label>Data Fine</label>
-                <InputDate class="form-control" @bind-Value="NuovoModulo.DataFine"></InputDate>
-            </div>
-            <div class="form-group">
-                <label>Materia</label>
-                <InputText class="form-control" @bind-Value="NuovoModulo.Materia"></InputText>
-            </div>
-            <div class="form-group">
-                <label>Corso</label>
-                <select class="form-control" @onchange="(e)=>Corso_OnChange(e)">
-                    <option></option>
-                    @if (db.Corsi.Count() > 0)
-                    {
-                        @foreach (var corso in db.Corsi)
-                        {
-                            <option value="@corso.Id">@corso.Nome @corso.AnnoInizio - @corso.AnnoFine</option>
-                        }
-                    }
-                </select>
-            </div>
-            <div class="form-group">
-                <label>Docente</label>
-                <select class="form-control" @onchange="(e)=>Docente_OnChange(e)">
-                    <option></option>
-                    @if (ServizioPersonaleFitstic.GetDocenti(db).Result.Count > 0)
-                    {
-                        @foreach (var docente in ServizioPersonaleFitstic.GetDocenti(db).Result)
-                        {
-                            <option value="@docente.Id">@docente.Nome @docente.Cognome Nato il @docente.DataNascita.ToShortDateString() e Assunto il @docente.DataAssunzione.ToShortDateString()</option>
-                        }
-                    }
-                </select>
-            </div>
-            <div class="form-group">
-                <label>Tutor</label>
-                <select class="form-control" @onchange="(e)=>Tutor_OnChange(e)">
-                    <option></option>
-                    @if (ServizioPersonaleFitstic.GetTutor(db).Result.Count > 0)
-                    {
-                        @foreach (var tutor in ServizioPersonaleFitstic.GetTutor(db).Result)
-                        {
-                            <option value="@tutor.Id">@tutor.Nome @tutor.Cognome Nato il @tutor.DataNascita.ToShortDateString() e Assunto il  @tutor.DataAssunzione.ToShortDateString()</option>
-                        }
-                    }
-                </select>
-            </div>
-            <div class="text-right">
-                <button type="reset" class="btn btn-secondary">Annulla</button>
-                <button type="submit" class="btn btn-success">Salva</button>
-            </div>
-        </EditForm>
-    </div>
-    <hr />
-    foreach (var corso in Corsi)
+    foreach (var corso in corsi)
     {
-        <table class="table table-bordered text-center">
-            <thead>
-                <tr>
-                    <th colspan="9">@corso.Nome @corso.AnnoInizio - @corso.AnnoFine</th>
-                </tr>
-                <tr>
-                    <th>ID</th>
-                    <th>Nome</th>
-                    <th>Data Inizio</th>
-                    <th>Data Fine</th>
-                    <th>Materia</th>
-                    <th>Docente</th>
-                    <th>Tutor</th>
-                    <th></th>
-                    <th></th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var modulo in ServizioModuli.GetModuli(db, corso).Result)
-                {
-                    <tr>
-                        <td class="align-middle">@modulo.Id</td>
-                        <td class="align-middle">@modulo.Nome</td>
-                        <td class="align-middle">@modulo.DataInizio.ToShortDateString()</td>
-                        @if (modulo.DataFine.HasValue)
-                        {
-                            <td class="align-middle">@modulo.DataFine.Value.ToShortDateString()</td>
-                        }
-                        else
-                        {
-                            <td class="align-middle">In Corso</td>
-                        }
-                        <td class="align-middle">@modulo.Materia</td>
-                        @using (var docente = ServizioModuli.GetDocenteDelModulo(db, modulo))
-                        {
-                            <td class="align-middle">
-                                @docente.Result.Nome @docente.Result.Cognome
-                            </td>
-                        }
-                        @using (var tutor = ServizioModuli.GetTutorDelModulo(db, modulo))
-                        {
-                            <td class="align-middle">
-                                @tutor.Result.Nome @tutor.Result.Cognome
-                            </td>
-                        }
-                        <td class="align-middle"><button type="button" data-toggle="modal" data-target="#modal" class="btn btn-primary" @onclick='(() => { ModalObject = modulo; } )'>Modifica</button></td>
-                        <td class="align-middle"><button type="button" class="btn btn-danger" @onclick="() => BtnElimina_Click(modulo)">Elimina</button></td>
-                    </tr>
-                }
-            </tbody>
-        </table>
-        <Modal Titolo="Modifica Modulo" Id="modal" OnClickSave="(e)=>BtnSalvaModifica_Click(e)">
-            @if (ModalObject != null)
-            {
-                @foreach (var prop in ModalObject.GetType().GetProperties())
-                {
-                    @switch (prop.Name)
-                    {
-                        case "Id":
-                            <label>@prop.Name</label>
-                            <input type="number" readonly class="form-control" @bind="ModalObject.Id" />
-                            break;
-                        case "Nome":
-                            <label>@prop.Name</label>
-                            <input type="text" class="form-control" @bind="ModalObject.Nome" />
-                            break;
-                        case "DataInizio":
-                            <label>Data Inizio</label>
-                            <input type="date" class="form-control" @bind="ModalObject.DataInizio" />
-                            break;
-                        case "DataFine":
-                            <label>Data Fine</label>
-                            <input type="date" class="form-control" @bind="ModalObject.DataFine" />
-                            break;
-                        case "Materia":
-                            <label>@prop.Name</label>
-                            <input type="text" class="form-control" @bind="ModalObject.Materia" />
-                            break;
-                        case "IdDocente":
-                            <label>Docente</label>
-                            <select class="form-control" @onchange="(e) => Docente_OnChange(e, ModalObject)">
-                                @if (ServizioPersonaleFitstic.GetDocenti(db).Result.Count > 0)
-                                {
-                                    @foreach (var docente in ServizioPersonaleFitstic.GetDocenti(db).Result)
+        <div class="card shadow mb-4">
+            <div class="card-header py-3 d-flex flex-row justify-content-between align-items-center">
+                <h6 class="m-0 font-weight-bold text-primary">@corso.Nome @corso.AnnoInizio - @corso.AnnoFine</h6>
+                <a href="/moduli/create" class="btn btn-success">Aggiungi</a>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table id="elencoModuli" class="table table-bordered" width="100%" cellspacing="0">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Nome</th>
+                                <th>Data Inizio</th>
+                                <th>Data Fine</th>
+                                <th>Materia</th>
+                                <th>Docente</th>
+                                <th>Tutor</th>
+                                <th></th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var modulo in moduli)
+                            {
+                                <tr>
+                                    <td>@modulo.Id</td>
+                                    <td>@modulo.Nome</td>
+                                    <td>@modulo.DataInizio.ToShortDateString()</td>
+                                    @if (modulo.DataFine.HasValue)
                                     {
-                                        @if (docente.Id == ModalObject.IdDocente)
-                                        {
-                                            <option selected value="@docente.Id">@docente.Nome @docente.Cognome Nato il @docente.DataNascita.ToShortDateString() e Assunto il @docente.DataAssunzione.ToShortDateString()</option>
-                                        }
-                                        else
-                                        {
-                                            <option value="@docente.Id">@docente.Nome @docente.Cognome Nato il @docente.DataNascita.ToShortDateString() e Assunto il @docente.DataAssunzione.ToShortDateString()</option>
-                                        }
-
+                                        <td>@modulo.DataFine.Value.ToShortDateString()</td>
                                     }
-                                }
-                            </select>
-                            break;
-                        case "IdCorso":
-                            <label>Corso</label>
-                            <select class="form-control" @onchange="(e)=>Corso_OnChange(e, ModalObject)">
-                                <option></option>
-                                @if (db.Corsi.Count() > 0)
-                                {
-                                    @foreach (var corso in db.Corsi)
+                                    else
                                     {
-                                        if (corso.Id == ModalObject.IdCorso)
-                                        {
-                                            <option selected value="@corso.Id">@corso.Nome @corso.AnnoInizio - @corso.AnnoFine</option>
-                                        }
-                                        else
-                                        {
-                                            <option value="@corso.Id">@corso.Nome @corso.AnnoInizio - @corso.AnnoFine</option>
-                                        }
-
+                                        <td>In Corso</td>
                                     }
-                                }
-                            </select>
-                            break;
-                        case "IdTutor":
-                            <label>Tutor</label>
-                            <select class="form-control" @onchange="(e)=>Tutor_OnChange(e, ModalObject)">
-                                @if (ServizioPersonaleFitstic.GetTutor(db).Result.Count > 0)
-                                {
-                                    @foreach (var tutor in ServizioPersonaleFitstic.GetTutor(db).Result)
+                                    <td>@modulo.Materia</td>
+                                    @using (var docente = ServizioModuli.GetDocenteDelModulo(db, modulo))
                                     {
-                                        @if (tutor.Id == ModalObject.IdTutor)
-                                        {
-                                            <option selected value="@tutor.Id">@tutor.Nome @tutor.Cognome Nato il @tutor.DataNascita.ToShortDateString() e Assunto il @tutor.DataAssunzione.ToShortDateString()</option>
-                                        }
-                                        else
-                                        {
-                                            <option value="@tutor.Id">@tutor.Nome @tutor.Cognome Nato il @tutor.DataNascita.ToShortDateString() e Assunto il @tutor.DataAssunzione.ToShortDateString()</option>
-                                        }
-
+                                        <td>
+                                            @docente.Result.Nome @docente.Result.Cognome
+                                        </td>
                                     }
-                                }
-                            </select>
-                            break;
-                        default: break;
-                    }
-
-                }
-            }
-        </Modal>
+                                    @using (var tutor = ServizioModuli.GetTutorDelModulo(db, modulo))
+                                    {
+                                        <td>
+                                            @tutor.Result.Nome @tutor.Result.Cognome
+                                        </td>
+                                    }
+                                    <td><a href="/moduli/view/@modulo.Id" class="btn btn-primary">Modifica</a></td>
+                                    <td><button type="button" class="btn btn-danger" @onclick="() => BtnElimina_Click(modulo)">Elimina</button></td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
     }
 }
 
@@ -239,7 +88,9 @@ else
     public Modulo NuovoModulo { get; set; } = new Modulo { DataInizio = DateTime.Now };
 
     List<Modulo> moduli;
-    List<Corso> Corsi;
+    List<Corso> corsi;
+    List<PersonaFitstic> docenti;
+    List<PersonaFitstic> tutors;
     public Modulo ModalObject { get; set; }
 
     [CascadingParameter]
@@ -250,52 +101,19 @@ else
         var user = (await authenticationStateTask).User;
         if (user.Identity.IsAuthenticated)
         {
-            Corsi = await db.Corsi.ToListAsync();
             moduli = await ServizioModuli.GetModuli(db);
+            corsi = await ServizioCorsi.GetCorsi(db);
+            docenti = await ServizioPersonaleFitstic.GetDocenti(db);
+            tutors = await ServizioPersonaleFitstic.GetTutor(db);
         }
         else NavigationManager.NavigateTo("/");
 
     }
-    protected void Corso_OnChange(ChangeEventArgs e, Modulo m = null)
+    protected async override Task OnAfterRenderAsync(bool firstRender)
     {
-        int id;
-        if (int.TryParse(e.Value.ToString(), out id))
-        {
-            if (m == null) NuovoModulo.IdCorso = id;
-            else m.IdCorso = id;
-        }
+        if (firstRender) await JSRuntime.InvokeVoidAsync("GeneraDataTableModuli");
     }
-    protected void Docente_OnChange(ChangeEventArgs e, Modulo m = null)
-    {
-        int id;
-        if (int.TryParse(e.Value.ToString(), out id))
-        {
-            if (m == null) NuovoModulo.IdDocente = id;
-            else m.IdDocente = id;
-        }
-    }
-    protected void Tutor_OnChange(ChangeEventArgs e, Modulo m = null)
-    {
-        int id;
-        if (int.TryParse(e.Value.ToString(), out id))
-        {
-            if (m == null) NuovoModulo.IdTutor = id;
-            else m.IdTutor = id;
-        }
-
-    }
-    public async Task BtnSalvaModifica_Click(EventArgs e)
-    {
-        await db.SaveChangesAsync();
-        StateHasChanged();
-    }
-    protected async Task Form_OnSubmit()
-    {
-        await ServizioModuli.SalvaModulo(db, NuovoModulo);
-        moduli = await ServizioModuli.GetModuli(db);
-        StateHasChanged();
-        NuovoModulo = new Modulo { DataInizio = DateTime.Now };
-    }
+    
     protected async Task BtnElimina_Click(Modulo modulo)
     {
         await ServizioModuli.EliminaModulo(db, modulo);

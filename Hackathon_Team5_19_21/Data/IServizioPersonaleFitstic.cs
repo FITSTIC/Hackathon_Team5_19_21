@@ -14,5 +14,6 @@ namespace Hackathon_Team5_19_21.Data
         Task<List<PersonaFitstic>> GetPersonale(ApplicationDbContext db);
         Task SalvaPersona(ApplicationDbContext db, PersonaFitstic p);
         Task EliminaPersona(ApplicationDbContext db, PersonaFitstic p);
+        Task<bool> ControllaRuoli(ApplicationDbContext db, PersonaFitstic p);
     }
 }

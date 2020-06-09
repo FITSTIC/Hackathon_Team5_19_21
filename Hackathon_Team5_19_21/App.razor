@@ -8,12 +8,16 @@
             }
             else
             {
-                <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)" />
+                <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(CustomLayout)" />
             }
         </Found>
         <NotFound>
-            <LayoutView Layout="@typeof(MainLayout)">
-                <p>Sorry, there's nothing at this address.</p>
+            <LayoutView Layout="@typeof(CustomLayout)">
+                <!-- 404 Error Text -->
+                <div class="text-center">
+                    <div class="error mx-auto" data-text="404">404</div>
+                    <p class="lead text-gray-800 mb-5">Page Not Found</p>
+                </div>
             </LayoutView>
         </NotFound>
     </Router>

@@ -18,6 +18,7 @@ using Hackathon_Team5_19_21.Areas.Identity;
 using Hackathon_Team5_19_21.Data;
 using Blazored.SessionStorage;
 using System.Net.Http;
+using Microsoft.JSInterop;
 
 namespace Hackathon_Team5_19_21
 {
@@ -45,6 +46,7 @@ namespace Hackathon_Team5_19_21
             services.AddScoped<AuthenticationStateProvider, CustomAuthenticationStateProvider>();
             services.AddSingleton<IServizioModuli, ServizioModuli>();
             services.AddSingleton<IServizioPersonaleFitstic, ServizioPersonaleFitstic>();
+            services.AddSingleton<IServizioCorsi, ServizioCorsi>();
             services.AddBlazoredSessionStorage();
         }
 

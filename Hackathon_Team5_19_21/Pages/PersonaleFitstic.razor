@@ -4,8 +4,6 @@
 @inject ApplicationDbContext db
 @inject IServizioPersonaleFitstic ServizioPersonaleFitstic
 @inject IJSRuntime IJSRuntime
-@using System.Text
-@using System.IO
 @inject Blazored.SessionStorage.ISessionStorageService sessionStorage
 
 <h1>Personale</h1>
@@ -18,197 +16,53 @@
 }
 else
 {
-    <div class="container">
-        <EditForm Model="@NuovaPersona" OnValidSubmit="()=>Form_OnSubmit()">
-            <DataAnnotationsValidator />
-            <ValidationSummary />
-            <div class="input-group mb-3">
-                <div class="input-group-prepend">
-                    <span class="input-group-text">Nome</span>
-                </div>
-                <InputText class="form-control" @bind-Value="NuovaPersona.Nome"></InputText>
+    <div class="card shadow mb-4">
+        <div class="card-header py-3 d-flex flex-row justify-content-between align-items-center">
+            <h6 class="m-0 font-weight-bold text-primary">Personale Fitstic</h6>
+            <a href="/personale/create" class="btn btn-success">Aggiungi</a>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table id="elencoPersonale" class="table table-bordered text-center">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nome</th>
+                            <th>Cognome</th>
+                            <th>Data Nascita</th>
+                            <th>Data Assunzione</th>
+                            <th>Docente</th>
+                            <th>Organizzatore</th>
+                            <th>Tutor</th>
+                            <th></th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var persona in personale)
+                        {
+                            <tr>
+                                <td class="align-middle">@persona.Id</td>
+                                <td class="align-middle">@persona.Nome</td>
+                                <td class="align-middle">@persona.Cognome</td>
+                                <td class="align-middle">@persona.DataNascita.ToShortDateString()</td>
+                                <td class="align-middle">@persona.DataAssunzione.ToShortDateString()</td>
+                                <td class="align-middle">@persona.Docente</td>
+                                <td class="align-middle">@persona.Organizzatore</td>
+                                <td class="align-middle">@persona.Tutor</td>
+                                <td class="align-middle"><a href="/personale/view/@persona.Id" class="btn btn-primary">Modifica</a></td>
+                                <td class="align-middle"><button type="button" class="btn btn-danger" @onclick="() => BtnElimina_Click(persona)">Elimina</button></td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
             </div>
-            <div class="input-group mb-3">
-                <div class="input-group-prepend">
-                    <span class="input-group-text">Cognome</span>
-                </div>
-                <InputText class="form-control" @bind-Value="NuovaPersona.Cognome"></InputText>
-            </div>
-            <div class="input-group mb-3">
-                <div class="input-group-prepend">
-                    <span class="input-group-text">Data Nascita</span>
-                </div>
-                <InputDate class="form-control" @bind-Value="NuovaPersona.DataNascita"></InputDate>
-            </div>
-            <div class="input-group mb-3">
-                <div class="input-group-prepend">
-                    <span class="input-group-text">Data Assunzione</span>
-                </div>
-                <InputDate class="form-control" @bind-Value="NuovaPersona.DataAssunzione"></InputDate>
-            </div>
-            <div class="input-group mb-3">
-                <div class="input-group-prepend">
-                    <span class="input-group-text">Ruoli</span>
-                </div>
-                <div class="form-control d-flex flex-row justify-content-around">
-                    <div class="custom-control custom-checkbox">
-                        <InputCheckbox class="custom-control-input" id="ckb1" @bind-Value="NuovaPersona.Docente"></InputCheckbox>
-                        <label class="custom-control-label" for="ckb1">Docente</label>
-                    </div>
-                    <div class="custom-control custom-checkbox">
-                        <InputCheckbox class="custom-control-input" id="ckb2" @bind-Value="NuovaPersona.Organizzatore"></InputCheckbox>
-                        <label class="custom-control-label" for="ckb2">Organizzatore</label>
-                    </div>
-                    <div class="custom-control custom-checkbox">
-                        <InputCheckbox class="custom-control-input" id="ckb3" @bind-Value="NuovaPersona.Tutor"></InputCheckbox>
-                        <label class="custom-control-label" for="ckb3">Tutor</label>
-                    </div>
-                </div>
-            </div>
-            <div class="input-group mb-3">
-                <div class="input-group-prepend">
-                    <span class="input-group-text">Email</span>
-                </div>
-                <InputText type="email" class="form-control" @bind-Value="NuovaPersona.Email"></InputText>
-            </div>
-            <div class="input-group mb-3">
-                <div class="input-group-prepend">
-                    <span class="input-group-text">Password</span>
-                </div>
-                <InputText class="form-control" @bind-Value="NuovaPersona.Password"></InputText>
-            </div>
-            <div class="input-group mb-3">
-                <div class="input-group-prepend">
-                    <span class="input-group-text">Telefono</span>
-                </div>
-                <InputText class="form-control" @bind-Value="NuovaPersona.Telefono"></InputText>
-            </div>
-            <div class="text-right">
-                <button type="reset" class="btn btn-secondary">Annulla</button>
-                <button type="submit" class="btn btn-success">Salva</button>
-            </div>
-        </EditForm>
+        </div>
     </div>
-    <hr />
-    <table class="table table-bordered text-center">
-        <thead>
-            <tr>
-                <th colspan="12">Personale Fitstic</th>
-            </tr>
-            <tr>
-                <th>ID</th>
-                <th>Nome</th>
-                <th>Cognome</th>
-                <th>Data Nascita</th>
-                <th>Data Assunzione</th>
-                <th>Docente</th>
-                <th>Organizzatore</th>
-                <th>Tutor</th>
-                <th>Email</th>
-                <th>Telefono</th>
-                <th></th>
-                <th></th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var persona in personale)
-            {
-                <tr>
-                    <td class="align-middle">@persona.Id</td>
-                    <td class="align-middle">@persona.Nome</td>
-                    <td class="align-middle">@persona.Cognome</td>
-                    <td class="align-middle">@persona.DataNascita.ToShortDateString()</td>
-                    <td class="align-middle">@persona.DataAssunzione.ToShortDateString()</td>
-                    <td class="align-middle">@persona.Docente</td>
-                    <td class="align-middle">@persona.Organizzatore</td>
-                    <td class="align-middle">@persona.Tutor</td>
-                    <td class="align-middle">@persona.Email</td>
-                    <td class="align-middle">@persona.Telefono</td>
-                    <td class="align-middle"><button type="button" data-toggle="modal" data-target="#modal" class="btn btn-primary" @onclick='(() => { ModalObject = persona; } )'>Modifica</button></td>
-                    <td class="align-middle"><button type="button" class="btn btn-danger" @onclick="() => BtnElimina_Click(persona)">Elimina</button></td>
-                </tr>
-            }
-        </tbody>
-    </table>
-    <Modal Titolo="Modifica Modulo" Id="modal" OnClickSave="(e)=>BtnSalvaModifica_Click(e, ModalObject)">
-        @if (ModalObject != null)
-        {
-            <div class="input-group mb-3">
-                <div class="input-group-prepend">
-                    <span class="input-group-text">ID</span>
-                </div>
-                <input readonly type="number" class="form-control" @bind="ModalObject.Id">
-            </div>
-            <div class="input-group mb-3">
-                <div class="input-group-prepend">
-                    <span class="input-group-text">Nome</span>
-                </div>
-                <input type="text" class="form-control" @bind="ModalObject.Nome" />
-            </div>
-            <div class="input-group mb-3">
-                <div class="input-group-prepend">
-                    <span class="input-group-text">Cognome</span>
-                </div>
-                <input type="text" class="form-control" @bind="ModalObject.Cognome" />
-            </div>
-            <div class="input-group mb-3">
-                <div class="input-group-prepend">
-                    <span class="input-group-text">Data Nascita</span>
-                </div>
-                <input type="date" class="form-control" @bind="ModalObject.DataNascita" />
-            </div>
-            <div class="input-group mb-3">
-                <div class="input-group-prepend">
-                    <span class="input-group-text">Data Assunzione</span>
-                </div>
-                <input type="date" class="form-control" @bind="ModalObject.DataAssunzione" />
-            </div>
-            <div class="input-group mb-3">
-                <div class="input-group-prepend">
-                    <span class="input-group-text">Ruoli</span>
-                </div>
-                <div class="form-control d-flex flex-row justify-content-around">
-                    <div class="custom-control custom-checkbox">
-                        <input type="checkbox" class="custom-control-input" id="checkDocente" @bind="ModalObject.Docente" />
-                        <label class="custom-control-label" for="checkDocente">Docente</label>
-                    </div>
-                    <div class="custom-control custom-checkbox">
-                        <input type="checkbox" class="custom-control-input" id="checkOrganizzatore" @bind="ModalObject.Organizzatore" />
-                        <label class="custom-control-label" for="checkOrganizzatore">Organizzatore</label>
-                    </div>
-                    <div class="custom-control custom-checkbox">
-                        <input type="checkbox" class="custom-control-input" id="checkTutor" @bind="ModalObject.Tutor" />
-                        <label class="custom-control-label" for="checkTutor">Tutor</label>
-                    </div>
-                </div>
-            </div>
-            <div class="input-group mb-3">
-                <div class="input-group-prepend">
-                    <span class="input-group-text">Email</span>
-                </div>
-                <input type="email" class="form-control" @bind="ModalObject.Email" />
-            </div>
-            <div class="input-group mb-3">
-                <div class="input-group-prepend">
-                    <span class="input-group-text">Password</span>
-                </div>
-                <input type="password" class="form-control" @bind="ModalObject.Password" />
-            </div>
-            <div class="input-group mb-3">
-                <div class="input-group-prepend">
-                    <span class="input-group-text">Telefono</span>
-                </div>
-                <input type="text" class="form-control" @bind="ModalObject.Telefono" />
-            </div>
-        }
-    </Modal>
 }
 @code {
-    public PersonaFitstic NuovaPersona { get; set; }
 
     List<PersonaFitstic> personale;
-
-    public PersonaFitstic ModalObject { get; set; }
 
     [CascadingParameter]
     private Task<AuthenticationState> authenticationStateTask { get; set; }
@@ -216,28 +70,14 @@ else
     protected async override Task OnInitializedAsync()
     {
         var user = (await authenticationStateTask).User;
-        if (user.Identity.IsAuthenticated)
-        {
-            var admin = await sessionStorage.GetItemAsync<Amministratore>("admin");
-            NuovaPersona = new PersonaFitstic { DataNascita = DateTime.Now, DataAssunzione = DateTime.Now, PrimaPassword = true, IdAmministratore = admin.Id };
-            personale = await ServizioPersonaleFitstic.GetPersonale(db);
-        }
+        if (user.Identity.IsAuthenticated) personale = await ServizioPersonaleFitstic.GetPersonale(db);
         else NavigationManager.NavigateTo("/");
     }
-    public async Task BtnSalvaModifica_Click(EventArgs e, PersonaFitstic p)
+    protected async override Task OnAfterRenderAsync(bool firstRender)
     {
-        p.Password = p.Password.Sha256();
-        await db.SaveChangesAsync();
-        StateHasChanged();
+        if(firstRender) await IJSRuntime.InvokeVoidAsync("GeneraDataTablePersonale");
     }
-    protected async Task Form_OnSubmit()
-    {
-        await ServizioPersonaleFitstic.SalvaPersona(db, NuovaPersona);
-        personale = await ServizioPersonaleFitstic.GetPersonale(db);
-        StateHasChanged();
-        var admin = await sessionStorage.GetItemAsync<Amministratore>("admin");
-        NuovaPersona = new PersonaFitstic { DataNascita = DateTime.Now, DataAssunzione = DateTime.Now, PrimaPassword = true, IdAmministratore = admin.Id };
-    }
+
     protected async Task BtnElimina_Click(PersonaFitstic p)
     {
         await ServizioPersonaleFitstic.EliminaPersona(db, p);

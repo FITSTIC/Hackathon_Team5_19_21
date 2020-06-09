@@ -1,0 +1,132 @@
+﻿@page "/moduli/create"
+@page "/moduli/view/{Id:int}"
+
+@inject IServizioModuli ServizioModuli
+@inject IServizioCorsi ServizioCorsi
+@inject IServizioPersonaleFitstic ServizioPersonaleFitstic
+@inject ApplicationDbContext db
+<h1>Moduli</h1>
+@if (Id == null)
+{
+    <p>Aggiungi un nuovo modulo</p>
+}
+else
+{
+    <p>Modifica un modulo</p>
+}
+<div class="container">
+    <EditForm Model="@Modulo" OnValidSubmit="() => Form_OnSubmit()">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+        <div class="input-group mb-3">
+            <div class="input-group-prepend">
+                <span class="input-group-text">Nome</span>
+            </div>
+            <InputText class="form-control" @bind-Value="Modulo.Nome"></InputText>
+        </div>
+        <div class="input-group mb-3">
+            <div class="input-group-prepend">
+                <span class="input-group-text">Data Inizio</span>
+            </div>
+            <InputDate class="form-control" @bind-Value="Modulo.DataInizio"></InputDate>
+        </div>
+        <div class="input-group mb-3">
+            <div class="input-group-prepend">
+                <span class="input-group-text">Data Fine</span>
+            </div>
+            <InputDate class="form-control" @bind-Value="Modulo.DataFine"></InputDate>
+        </div>
+        <div class="input-group mb-3">
+            <div class="input-group-prepend">
+                <span class="input-group-text">Materia</span>
+            </div>
+            <InputText class="form-control" @bind-Value="Modulo.Materia"></InputText>
+        </div>
+        <div class="input-group mb-3">
+            <div class="input-group-prepend">
+                <label class="input-group-text">Corso</label>
+            </div>
+            <select class="custom-select" @bind="Modulo.IdCorso">
+                @if (Id == null)
+                {
+                    <option value="0">Seleziona un corso</option>
+                }
+                @foreach (var corso in corsi)
+                {
+                    <option value="@corso.Id">@corso.Nome @corso.AnnoInizio - @corso.AnnoFine</option>
+
+                }
+            </select>
+        </div>
+        <div class="input-group mb-3">
+            <div class="input-group-prepend">
+                <label class="input-group-text">Docente</label>
+            </div>
+            <select class="custom-select" @bind="Modulo.IdDocente">
+                @if (Id == null)
+                {
+                    <option value="0">Seleziona un docente</option>
+                }
+                @foreach (var docente in docenti)
+                {
+                    <option value="@docente.Id">@docente.Nome @docente.Cognome Nato il @docente.DataNascita.ToShortDateString() e Assunto il @docente.DataAssunzione.ToShortDateString()</option>
+                }
+            </select>
+        </div>
+        <div class="input-group mb-3">
+            <div class="input-group-prepend">
+                <label class="input-group-text">Tutor</label>
+            </div>
+            <select class="custom-select" @bind="Modulo.IdTutor">
+                @if (Id == null)
+                {
+                    <option value="0">Seleziona un tutor</option>
+                }
+                @foreach (var tutor in tutors)
+                {
+                    <option value="@tutor.Id">@tutor.Nome @tutor.Cognome Nato il @tutor.DataNascita.ToShortDateString() e Assunto il  @tutor.DataAssunzione.ToShortDateString()</option>
+                }
+            </select>
+        </div>
+        <div class="text-right">
+            <a href="/moduli" class="btn btn-secondary">Annulla</a>
+            <button type="submit" class="btn btn-success">Salva</button>
+        </div>
+    </EditForm>
+</div>
+
+@code {
+    [Parameter]
+    public int? Id { get; set; }
+
+    public Modulo Modulo { get; set; }
+    List<Modulo> moduli;
+    List<Corso> corsi;
+    List<PersonaFitstic> docenti;
+    List<PersonaFitstic> tutors;
+
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationStateTask { get; set; }
+
+    protected async override Task OnInitializedAsync()
+    {
+        var user = (await authenticationStateTask).User;
+        if (user.Identity.IsAuthenticated)
+        {
+            moduli = await ServizioModuli.GetModuli(db);
+            corsi = await ServizioCorsi.GetCorsi(db);
+            docenti = await ServizioPersonaleFitstic.GetDocenti(db);
+            tutors = await ServizioPersonaleFitstic.GetTutor(db);
+            Modulo = Id == null ? new Modulo { DataInizio = DateTime.Now } : await db.Moduli.FindAsync(Id);
+        }
+        else NavigationManager.NavigateTo("/");
+
+    }
+    protected async Task Form_OnSubmit()
+    {
+        if (Id == null) await ServizioModuli.SalvaModulo(db, Modulo);
+        else await db.SaveChangesAsync();
+        StateHasChanged();
+        NavigationManager.NavigateTo("/moduli");
+    }
+}
