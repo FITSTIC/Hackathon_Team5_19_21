@@ -44,15 +44,17 @@ namespace Hackathon_Team5_19_21
             services.AddServerSideBlazor();
             //services.AddScoped<AuthenticationStateProvider, RevalidatingIdentityAuthenticationStateProvider<IdentityUser>>();
             services.AddScoped<AuthenticationStateProvider, CustomAuthenticationStateProvider>();
-            services.AddSingleton<IServizioModuli, ServizioModuli>();
-            services.AddSingleton<IServizioPersonaleFitstic, ServizioPersonaleFitstic>();
-            services.AddSingleton<IServizioCorsi, ServizioCorsi>();
+            services.AddScoped<IServizioModuli, ServizioModuli>();
+            services.AddScoped<IServizioPersonaleFitstic, ServizioPersonaleFitstic>();
+            services.AddScoped<IServizioCorsi, ServizioCorsi>();
+            services.AddScoped<IServizioCitta, ServizioCitta>();
             services.AddBlazoredSessionStorage();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ApplicationDbContext db)
         {
+            db.Database.EnsureCreated();
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();

@@ -1,10 +1,9 @@
 ﻿@layout LoginLayout
 @page "/"
-@using Hackathon_Team5_19_21.Data
+
 @inject AuthenticationStateProvider AuthenticationStateProvider
-@inject NavigationManager NavigationManager
 @inject Blazored.SessionStorage.ISessionStorageService sessionStorage
-@inject ApplicationDbContext db
+
     <!-- Outer Row -->
     <div class="row justify-content-center">
 
@@ -14,7 +13,7 @@
                 <div class="card-body p-0">
                     <!-- Nested Row within Card Body -->
                     <div class="row">
-                        <div class="col-lg-6 d-none d-lg-block">
+                        <div class="col-lg-6 d-none d-lg-flex align-items-lg-center justify-content-lg-center">
                             <img src="/images/logo.jpg" class="w-auto img-fluid p-5" />
                         </div>
                         <div class="col-lg-6">
@@ -22,7 +21,8 @@
                                 <div class="text-center">
                                     <h1 class="h4 text-gray-900 mb-4">Login</h1>
                                 </div>
-                                <form class="user" @onkeyup='async (e)=> { if (e.Key == "Enter") await ValidateUser(); }'>
+                                <Alert Type="Alert.TypeMessage.Danger" IsVisible="IsVisible">@LoginMessage</Alert>
+                                <form class="user" @onkeyup='async (e)=> { if (e.Key == "Enter") await ValidateUser();IsVisible = false; }'>
                                     <div class="form-group">
                                         <input type="email" class="form-control form-control-user" @bind="Email" required placeholder="Email Address...">
                                     </div>
@@ -63,12 +63,12 @@
         {
             if (Email != "" && Email != null && Password != "" && Password != null)
             {
-                var result = db.Amministratori.Where(x => x.Email == Email && x.Password == Password.Sha256()).ToList();
-                if (result.Count > 0)
+                var result = await ((CustomAuthenticationStateProvider)AuthenticationStateProvider).VerificaCredenziali(Email, Password);
+                if (result!=null)
                 {
                     ((CustomAuthenticationStateProvider)AuthenticationStateProvider).MarkUserAsAuthenticated(Email);
                     await sessionStorage.SetItemAsync("email", Email);
-                    await sessionStorage.SetItemAsync("admin", result[0]);
+                    await sessionStorage.SetItemAsync("admin", result);
                     NavigationManager.NavigateTo("/index");
                 }
                 else

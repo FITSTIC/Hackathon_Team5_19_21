@@ -6,15 +6,19 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using Hackathon_Team5_19_21.Shared;
+using Microsoft.EntityFrameworkCore;
 
 namespace Hackathon_Team5_19_21.Data
 {
     public class CustomAuthenticationStateProvider : AuthenticationStateProvider
     {
         ISessionStorageService _sessionStorage;
-        public CustomAuthenticationStateProvider(ISessionStorageService sessionStorage)
+        ApplicationDbContext _db;
+        public CustomAuthenticationStateProvider(ISessionStorageService sessionStorage, ApplicationDbContext db)
         {
             _sessionStorage = sessionStorage;
+            _db = db;
         }
         public override async Task<AuthenticationState> GetAuthenticationStateAsync()
         {
@@ -37,6 +41,10 @@ namespace Hackathon_Team5_19_21.Data
             var identity = new ClaimsIdentity();
             var user = new ClaimsPrincipal(identity);
             NotifyAuthenticationStateChanged(Task.FromResult(new AuthenticationState(user)));
+        }
+        public async Task<Amministratore> VerificaCredenziali(string email, string password)
+        {
+            return await _db.Amministratori.FirstOrDefaultAsync(x => x.Email == email && x.Password == password.Sha256());
         }
     }
 }

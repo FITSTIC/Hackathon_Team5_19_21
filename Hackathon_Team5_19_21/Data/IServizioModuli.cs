@@ -7,12 +7,14 @@ namespace Hackathon_Team5_19_21.Data
 {
     public interface IServizioModuli
     {
-        Task SalvaModulo(ApplicationDbContext db, Modulo modulo);
-        Task<List<Modulo>> GetModuli(ApplicationDbContext db);
-        Task<List<Modulo>> GetModuli(ApplicationDbContext db, Corso corso);
-        Task<PersonaFitstic> GetTutorDelModulo(ApplicationDbContext db, Modulo modulo);
-        Task<PersonaFitstic> GetDocenteDelModulo(ApplicationDbContext db, Modulo modulo);
-        
-        Task EliminaModulo(ApplicationDbContext db, Modulo modulo);
+        Task SalvaModulo(Modulo modulo);
+        Task<List<Modulo>> GetModuli();
+        Task<List<Modulo>> GetModuli(Corso corso);
+        Task<PersonaFitstic> GetTutorDelModulo(Modulo modulo);
+        Task<PersonaFitstic> GetDocenteDelModulo(Modulo modulo);
+        Task<List<Modulo>> GetModuliDelCorso(Corso corso);
+        Task EliminaModulo(Modulo modulo);
+        Task<Modulo> GetModuloById(int id);
+        Task SalvaCambiamenti();
     }
 }

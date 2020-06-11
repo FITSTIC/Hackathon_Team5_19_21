@@ -2,8 +2,7 @@
 @page "/personale/view/{Id:int}"
 
 @inject IServizioPersonaleFitstic ServizioPersonaleFitstic
-@inject ApplicationDbContext db
-@inject Blazored.SessionStorage.ISessionStorageService sessionStorage
+
 <h1>Personale</h1>
 @if (Id == null)
 {
@@ -128,18 +127,18 @@ else
         var user = (await authenticationStateTask).User;
         if (user.Identity.IsAuthenticated)
         {
-            var admin = await db.Amministratori.FirstAsync(x => x.Email == user.Identity.Name);
-            Persona = Id == null ? new PersonaFitstic { DataNascita = DateTime.Now, DataAssunzione = DateTime.Now, PrimaPassword = true, IdAmministratore = admin.Id } : await db.PersonaleFitstic.FindAsync(Id);
+            var admin = await ServizioPersonaleFitstic.GetAdminByEmail(user.Identity.Name);
+            Persona = Id == null ? new PersonaFitstic { DataNascita = DateTime.Now, DataAssunzione = DateTime.Now, PrimaPassword = true, IdAmministratore = admin.Id } : await ServizioPersonaleFitstic.GetPersonaById((int)Id);
         }
         else NavigationManager.NavigateTo("/");
     }
     protected async Task Form_OnSubmit()
     {
-        if (Id == null) await ServizioPersonaleFitstic.SalvaPersona(db, Persona);
+        if (Id == null) await ServizioPersonaleFitstic.SalvaPersona(Persona);
         else
         {
             if (Persona.PrimaPassword) Persona.Password = Persona.Password.Sha256();
-            if (await ServizioPersonaleFitstic.ControllaRuoli(db, Persona)) await db.SaveChangesAsync();
+            if (await ServizioPersonaleFitstic.ControllaRuoli(Persona)) await ServizioPersonaleFitstic.SalvaCambiamenti();
         }
         StateHasChanged();
         NavigationManager.NavigateTo("/personale");

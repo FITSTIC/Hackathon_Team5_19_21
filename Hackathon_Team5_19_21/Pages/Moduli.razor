@@ -1,30 +1,20 @@
 ﻿@page "/moduli"
 
-@using Hackathon_Team5_19_21.Data
-@using Microsoft.EntityFrameworkCore
-@inject ApplicationDbContext db
 @inject IServizioModuli ServizioModuli
 @inject IServizioPersonaleFitstic ServizioPersonaleFitstic
 @inject IServizioCorsi ServizioCorsi
-@inject Blazored.SessionStorage.ISessionStorageService sessionStorage
-@inject IJSRuntime JSRuntime
 
 <h1>Moduli</h1>
 
 <p>Visualizza i moduli</p>
-
-@if (moduli == null)
+@if (corsi != null)
 {
-    <p><em>Loading...</em></p>
-}
-else
-{
-    foreach (var corso in corsi)
+    @foreach (var corso in corsi)
     {
         <div class="card shadow mb-4">
             <div class="card-header py-3 d-flex flex-row justify-content-between align-items-center">
                 <h6 class="m-0 font-weight-bold text-primary">@corso.Nome @corso.AnnoInizio - @corso.AnnoFine</h6>
-                <a href="/moduli/create" class="btn btn-success">Aggiungi</a>
+                <a href="/moduli/create/@corso.Id" class="btn btn-success">Aggiungi</a>
             </div>
             <div class="card-body">
                 <div class="table-responsive">
@@ -43,7 +33,7 @@ else
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach (var modulo in moduli)
+                            @foreach (var modulo in ServizioModuli.GetModuliDelCorso(corso).Result)
                             {
                                 <tr>
                                     <td>@modulo.Id</td>
@@ -58,13 +48,13 @@ else
                                         <td>In Corso</td>
                                     }
                                     <td>@modulo.Materia</td>
-                                    @using (var docente = ServizioModuli.GetDocenteDelModulo(db, modulo))
+                                    @using (var docente = ServizioModuli.GetDocenteDelModulo(modulo))
                                     {
                                         <td>
                                             @docente.Result.Nome @docente.Result.Cognome
                                         </td>
                                     }
-                                    @using (var tutor = ServizioModuli.GetTutorDelModulo(db, modulo))
+                                    @using (var tutor = ServizioModuli.GetTutorDelModulo(modulo))
                                     {
                                         <td>
                                             @tutor.Result.Nome @tutor.Result.Cognome
@@ -82,16 +72,11 @@ else
     }
 }
 
-
 @code {
 
-    public Modulo NuovoModulo { get; set; } = new Modulo { DataInizio = DateTime.Now };
-
-    List<Modulo> moduli;
     List<Corso> corsi;
     List<PersonaFitstic> docenti;
     List<PersonaFitstic> tutors;
-    public Modulo ModalObject { get; set; }
 
     [CascadingParameter]
     private Task<AuthenticationState> authenticationStateTask { get; set; }
@@ -101,10 +86,9 @@ else
         var user = (await authenticationStateTask).User;
         if (user.Identity.IsAuthenticated)
         {
-            moduli = await ServizioModuli.GetModuli(db);
-            corsi = await ServizioCorsi.GetCorsi(db);
-            docenti = await ServizioPersonaleFitstic.GetDocenti(db);
-            tutors = await ServizioPersonaleFitstic.GetTutor(db);
+            corsi = await ServizioCorsi.GetCorsi();
+            docenti = await ServizioPersonaleFitstic.GetDocenti();
+            tutors = await ServizioPersonaleFitstic.GetTutor();
         }
         else NavigationManager.NavigateTo("/");
 
@@ -113,11 +97,10 @@ else
     {
         if (firstRender) await JSRuntime.InvokeVoidAsync("GeneraDataTableModuli");
     }
-    
+
     protected async Task BtnElimina_Click(Modulo modulo)
     {
-        await ServizioModuli.EliminaModulo(db, modulo);
-        moduli = await ServizioModuli.GetModuli(db);
+        await ServizioModuli.EliminaModulo(modulo);
         StateHasChanged();
 
     }

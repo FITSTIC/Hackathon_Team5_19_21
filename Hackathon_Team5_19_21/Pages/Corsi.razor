@@ -1,0 +1,82 @@
+﻿@page "/corsi"
+
+@inject IServizioCorsi ServizioCorsi
+@inject IServizioPersonaleFitstic ServizioPersonaleFitstic
+@inject IServizioCitta ServizioCitta
+
+<h1>Corsi</h1>
+
+<p>Visualizza i corsi</p>
+
+
+<div class="card shadow mb-4">
+    <div class="card-header py-3 d-flex flex-row justify-content-between align-items-center">
+        <h6 class="m-0 font-weight-bold text-primary">Corsi</h6>
+        <a href="/corsi/create" class="btn btn-success">Aggiungi</a>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table id="elencoPersonale" class="table table-bordered text-center">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nome</th>
+                        <th>Anno di Inizio</th>
+                        <th>Anno di Fine</th>
+                        <th>Citta</th>
+                        <th>Organizzatore</th>
+                        <th></th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (corsi != null)
+                    {
+                        @foreach (var corso in corsi)
+                        {
+                            <tr>
+                                <td class="align-middle">@corso.Id</td>
+                                <td class="align-middle">@corso.Nome</td>
+                                <td class="align-middle">@corso.AnnoInizio</td>
+                                <td class="align-middle">@corso.AnnoFine</td>
+                                <td class="align-middle">@ServizioCitta.GetCittaById(corso.IdCitta).Result.Nome (@ServizioCitta.GetProvinciaByIdCitta(corso.IdCitta).Result.Sigla)</td>
+                                <td class="align-middle">@ServizioPersonaleFitstic.GetPersonaById(corso.IdOrganizzatore).Result.Nome  @ServizioPersonaleFitstic.GetPersonaById(corso.IdOrganizzatore).Result.Cognome </td>
+                                <td class="align-middle"><a href="/corsi/view/@corso.Id" class="btn btn-primary">Modifica</a></td>
+                                <td class="align-middle"><button type="button" class="btn btn-danger" @onclick="() => BtnElimina_Click(corso)">Elimina</button></td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+
+@code {
+    List<Corso> corsi;
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationStateTask { get; set; }
+
+    protected async override Task OnInitializedAsync()
+    {
+        var user = (await authenticationStateTask).User;
+        if (user.Identity.IsAuthenticated)
+        {
+            corsi = await ServizioCorsi.GetCorsi();
+        }
+        else NavigationManager.NavigateTo("/");
+    }
+
+    protected async override Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender) await JSRuntime.InvokeVoidAsync("GeneraDataTableCorsi");
+    }
+
+    protected async Task BtnElimina_Click(Corso c)
+    {
+        await ServizioCorsi.EliminaCorso(c);
+        corsi = await ServizioCorsi.GetCorsi();
+        StateHasChanged();
+    }
+}

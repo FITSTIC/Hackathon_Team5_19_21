@@ -1,0 +1,137 @@
+﻿@page "/corsi/create"
+@page "/corsi/view/{Id:int}"
+
+@inject IServizioCitta ServizioCitta
+@inject IServizioPersonaleFitstic ServizioPersonaleFitstic
+@inject IServizioCorsi ServizioCorsi
+
+<h3>Corsi</h3>
+@if (Id == null)
+{
+    <p>Aggiungi un nuovo corso</p>
+}
+else
+{
+    <p>Modifica un corso</p>
+}
+<div class="container">
+    <EditForm Model="@Corso" OnValidSubmit="() => Form_OnSubmit()">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+        <div class="input-group mb-3">
+            <div class="input-group-prepend">
+                <span class="input-group-text">Nome</span>
+            </div>
+            <InputText class="form-control" @bind-Value="Corso.Nome"></InputText>
+        </div>
+        <div class="input-group mb-3">
+            <div class="input-group-prepend">
+                <span class="input-group-text">Anno Inizio</span>
+            </div>
+            <InputNumber class="form-control" @bind-Value="Corso.AnnoInizio"></InputNumber>
+        </div>
+        <div class="input-group mb-3">
+            <div class="input-group-prepend">
+                <span class="input-group-text">Anno Fine</span>
+            </div>
+            <InputNumber class="form-control" @bind-Value="Corso.AnnoFine"></InputNumber>
+        </div>
+        <div class="input-group mb-3">
+            <div class="input-group-prepend">
+                <label class="input-group-text">Provincia</label>
+            </div>
+            <select class="custom-select" @onchange="(e)=>Provincia_OnChange(e)">
+                @if (Id == null)
+                {
+                    <option selected value="0">Seleziona una provincia</option>
+                    @foreach (var provincia in province)
+                    {
+                        <option value="@provincia.Id">@provincia.Nome</option>
+                    }
+                }
+                else
+                {
+                    @foreach (var provincia in province)
+                    {
+                        @if (provincia.Id == ServizioCitta.GetProvinciaByIdCitta(Corso.IdCitta).Result.Id)
+                        {
+                            <option selected value="@provincia.Id">@provincia.Nome</option>
+                        }
+                        else
+                        {
+                            <option value="@provincia.Id">@provincia.Nome</option>
+                        }
+                    }
+                }
+            </select>
+        </div>
+        <div class="input-group mb-3">
+            <div class="input-group-prepend">
+                <label class="input-group-text">Citta</label>
+            </div>
+            <select class="custom-select" @bind="Corso.IdCitta">
+                @if (Id == null)
+                {
+                    <option value="0">Seleziona una citta</option>
+                }
+                @foreach (var citta in cittas)
+                {
+                    <option value="@citta.Id">@citta.Nome</option>
+                }
+            </select>
+        </div>
+        <div class="input-group mb-3">
+            <div class="input-group-prepend">
+                <label class="input-group-text">Organizzatore</label>
+            </div>
+            <select class="custom-select" @bind="Corso.IdOrganizzatore">
+                @if (Id == null)
+                {
+                    <option value="0">Seleziona un organizzatore</option>
+                }
+                @foreach (var organizzatore in ServizioPersonaleFitstic.GetOrganizzatori().Result)
+                {
+                    <option value="@organizzatore.Id">@organizzatore.Nome @organizzatore.Cognome Nato il @organizzatore.DataNascita.ToShortDateString() e Assunto il @organizzatore.DataAssunzione.ToShortDateString()</option>
+                }
+            </select>
+        </div>
+        <div class="text-right">
+            <a href="/corsi" class="btn btn-secondary">Annulla</a>
+            <button type="submit" class="btn btn-success">Salva</button>
+        </div>
+    </EditForm>
+</div>
+@code {
+    [Parameter]
+    public int? Id { get; set; }
+    public Corso Corso { get; set; }
+    List<Provincia> province;
+    List<Citta> cittas;
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationStateTask { get; set; }
+
+    protected async override Task OnInitializedAsync()
+    {
+        var user = (await authenticationStateTask).User;
+        if (user.Identity.IsAuthenticated)
+        {
+            province = await ServizioCitta.GetProvince();
+            Corso = Id == null ? new Corso { AnnoInizio = DateTime.Now.Year, AnnoFine = DateTime.Now.Year } : await ServizioCorsi.CorsoById((int)Id);
+            cittas = Id != null ? await ServizioCitta.GetCittaByIdProvicia(ServizioCitta.GetProvinciaByIdCitta(Corso.IdCitta).Result.Id) : new List<Citta>();
+        }
+        else NavigationManager.NavigateTo("/");
+    }
+    protected async Task Form_OnSubmit()
+    {
+        if (Id == null) await ServizioCorsi.SalvaCorso(Corso);
+        else await ServizioCorsi.SalvaCambiamenti();
+        StateHasChanged();
+        NavigationManager.NavigateTo("/corsi");
+    }
+    protected async Task Provincia_OnChange(ChangeEventArgs e)
+    {
+        int idProv;
+        Corso.IdCitta = 0;
+        if (int.TryParse(e.Value.ToString(), out idProv)) cittas = await ServizioCitta.GetCittaByIdProvicia(idProv);
+    }
+}

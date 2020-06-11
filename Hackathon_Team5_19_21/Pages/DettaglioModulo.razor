@@ -1,10 +1,10 @@
-﻿@page "/moduli/create"
+﻿@page "/moduli/create/{IdCorso:int}"
 @page "/moduli/view/{Id:int}"
 
 @inject IServizioModuli ServizioModuli
 @inject IServizioCorsi ServizioCorsi
 @inject IServizioPersonaleFitstic ServizioPersonaleFitstic
-@inject ApplicationDbContext db
+
 <h1>Moduli</h1>
 @if (Id == null)
 {
@@ -42,6 +42,8 @@ else
             </div>
             <InputText class="form-control" @bind-Value="Modulo.Materia"></InputText>
         </div>
+        @if (Id != null)
+        {
         <div class="input-group mb-3">
             <div class="input-group-prepend">
                 <label class="input-group-text">Corso</label>
@@ -58,6 +60,7 @@ else
                 }
             </select>
         </div>
+        }
         <div class="input-group mb-3">
             <div class="input-group-prepend">
                 <label class="input-group-text">Docente</label>
@@ -98,6 +101,8 @@ else
 @code {
     [Parameter]
     public int? Id { get; set; }
+    [Parameter]
+    public int IdCorso { get; set; }
 
     public Modulo Modulo { get; set; }
     List<Modulo> moduli;
@@ -113,19 +118,19 @@ else
         var user = (await authenticationStateTask).User;
         if (user.Identity.IsAuthenticated)
         {
-            moduli = await ServizioModuli.GetModuli(db);
-            corsi = await ServizioCorsi.GetCorsi(db);
-            docenti = await ServizioPersonaleFitstic.GetDocenti(db);
-            tutors = await ServizioPersonaleFitstic.GetTutor(db);
-            Modulo = Id == null ? new Modulo { DataInizio = DateTime.Now } : await db.Moduli.FindAsync(Id);
+            moduli = await ServizioModuli.GetModuli();
+            corsi = await ServizioCorsi.GetCorsi();
+            docenti = await ServizioPersonaleFitstic.GetDocenti();
+            tutors = await ServizioPersonaleFitstic.GetTutor();
+            Modulo = Id == null ? new Modulo { DataInizio = DateTime.Now, IdCorso=IdCorso } : await ServizioModuli.GetModuloById((int)Id);
         }
         else NavigationManager.NavigateTo("/");
 
     }
     protected async Task Form_OnSubmit()
     {
-        if (Id == null) await ServizioModuli.SalvaModulo(db, Modulo);
-        else await db.SaveChangesAsync();
+        if (Id == null) await ServizioModuli.SalvaModulo(Modulo);
+        else await ServizioModuli.SalvaCambiamenti();
         StateHasChanged();
         NavigationManager.NavigateTo("/moduli");
     }

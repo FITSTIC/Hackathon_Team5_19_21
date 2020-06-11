@@ -1,36 +1,9 @@
 ﻿@if (IsVisible)
 {
-    @switch (Type)
-    {
-        case TypeMessage.Danger:
-            Classe = "danger";
-            break;
-        case TypeMessage.Warning:
-            Classe = "warning";
-            break;
-        case TypeMessage.Success:
-            Classe = "success";
-            break;
-        case TypeMessage.Primary:
-            Classe = "primary";
-            break;
-        case TypeMessage.Info:
-            Classe = "info";
-            break;
-        case TypeMessage.Dark:
-            Classe = "dark";
-            break;
-        case TypeMessage.Secondary:
-            Classe = "secondary";
-            break;
-        case TypeMessage.Light:
-            Classe = "light";
-            break;
-    }
-    <div class="alert alert-@Classe" role="alert">
+    <div class="alert alert-@Classe">
         @ChildContent
-        <button type="button" class="close" @onclick="()=>Chiudi()" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
+        <button type="button" class="close" @onclick="(() => Chiudi())">
+            <span>&times;</span>
         </button>
     </div>
 }
@@ -44,9 +17,40 @@
     [Parameter]
     public RenderFragment ChildContent { get; set; }
 
+    protected override void OnInitialized()
+    {
+        switch (Type)
+        {
+            case TypeMessage.Danger:
+                Classe = "danger";
+                break;
+            case TypeMessage.Warning:
+                Classe = "warning";
+                break;
+            case TypeMessage.Success:
+                Classe = "success";
+                break;
+            case TypeMessage.Primary:
+                Classe = "primary";
+                break;
+            case TypeMessage.Info:
+                Classe = "info";
+                break;
+            case TypeMessage.Dark:
+                Classe = "dark";
+                break;
+            case TypeMessage.Secondary:
+                Classe = "secondary";
+                break;
+            case TypeMessage.Light:
+                Classe = "light";
+                break;
+        }
+    }
+
     string Classe = "";
 
-    public void Chiudi()
+    private void Chiudi()
     {
         IsVisible = false;
     }

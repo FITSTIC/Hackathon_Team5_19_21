@@ -1,44 +1,36 @@
 ﻿@page "/personale"
 
-@using Hackathon_Team5_19_21.Data
-@inject ApplicationDbContext db
 @inject IServizioPersonaleFitstic ServizioPersonaleFitstic
-@inject IJSRuntime IJSRuntime
-@inject Blazored.SessionStorage.ISessionStorageService sessionStorage
 
 <h1>Personale</h1>
 
 <p>Visualizza il personale</p>
 
-@if (personale == null)
-{
-    <p><em>Loading...</em></p>
-}
-else
-{
-    <div class="card shadow mb-4">
-        <div class="card-header py-3 d-flex flex-row justify-content-between align-items-center">
-            <h6 class="m-0 font-weight-bold text-primary">Personale Fitstic</h6>
-            <a href="/personale/create" class="btn btn-success">Aggiungi</a>
-        </div>
-        <div class="card-body">
-            <div class="table-responsive">
-                <table id="elencoPersonale" class="table table-bordered text-center">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Nome</th>
-                            <th>Cognome</th>
-                            <th>Data Nascita</th>
-                            <th>Data Assunzione</th>
-                            <th>Docente</th>
-                            <th>Organizzatore</th>
-                            <th>Tutor</th>
-                            <th></th>
-                            <th></th>
-                        </tr>
-                    </thead>
-                    <tbody>
+<div class="card shadow mb-4">
+    <div class="card-header py-3 d-flex flex-row justify-content-between align-items-center">
+        <h6 class="m-0 font-weight-bold text-primary">Personale Fitstic</h6>
+        <a href="/personale/create" class="btn btn-success">Aggiungi</a>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table id="elencoPersonale" class="table table-bordered text-center">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nome</th>
+                        <th>Cognome</th>
+                        <th>Data Nascita</th>
+                        <th>Data Assunzione</th>
+                        <th>Docente</th>
+                        <th>Organizzatore</th>
+                        <th>Tutor</th>
+                        <th></th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (personale != null)
+                    {
                         @foreach (var persona in personale)
                         {
                             <tr>
@@ -54,12 +46,13 @@ else
                                 <td class="align-middle"><button type="button" class="btn btn-danger" @onclick="() => BtnElimina_Click(persona)">Elimina</button></td>
                             </tr>
                         }
-                    </tbody>
-                </table>
-            </div>
+                    }
+                </tbody>
+            </table>
         </div>
     </div>
-}
+</div>
+
 @code {
 
     List<PersonaFitstic> personale;
@@ -70,18 +63,18 @@ else
     protected async override Task OnInitializedAsync()
     {
         var user = (await authenticationStateTask).User;
-        if (user.Identity.IsAuthenticated) personale = await ServizioPersonaleFitstic.GetPersonale(db);
+        if (user.Identity.IsAuthenticated) personale = await ServizioPersonaleFitstic.GetPersonale();
         else NavigationManager.NavigateTo("/");
     }
     protected async override Task OnAfterRenderAsync(bool firstRender)
     {
-        if(firstRender) await IJSRuntime.InvokeVoidAsync("GeneraDataTablePersonale");
+        if (firstRender) await JSRuntime.InvokeVoidAsync("GeneraDataTablePersonale");
     }
 
     protected async Task BtnElimina_Click(PersonaFitstic p)
     {
-        await ServizioPersonaleFitstic.EliminaPersona(db, p);
-        personale = await ServizioPersonaleFitstic.GetPersonale(db);
+        await ServizioPersonaleFitstic.EliminaPersona(p);
+        personale = await ServizioPersonaleFitstic.GetPersonale();
         StateHasChanged();
 
     }

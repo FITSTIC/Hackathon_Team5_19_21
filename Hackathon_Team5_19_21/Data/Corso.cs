@@ -16,7 +16,6 @@ namespace Hackathon_Team5_19_21.Data
         public int AnnoInizio { get; set; }
         [Required]
         public int AnnoFine { get; set; }
-        [Required]
         public Citta Citta { get; set; }
         [Required]
         public int IdCitta { get; set; }

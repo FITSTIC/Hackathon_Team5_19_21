@@ -98,6 +98,9 @@ namespace Hackathon_Team5_19_21.Data
             .WithMany(b => b.ModuliTutor)
             .HasForeignKey(p => p.IdTutor)
             .HasConstraintName("ForeignKey_Modulo_Tutor").OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Amministratore>().HasIndex(x => x.Email).IsUnique();
+            modelBuilder.Entity<PersonaFitstic>().HasIndex(x => x.Email).IsUnique();
         }
     }
 }

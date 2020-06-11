@@ -38,3 +38,23 @@ function GeneraDataTablePersonale() {
         }
     })
 }
+
+function GeneraDataTableCorsi() {
+
+    $("table").DataTable({
+        "paging": true,
+        "searching": true,
+        "columnDefs": [
+            {
+                "targets": [6, 7],
+                "orderable": false,
+                "searchable": false
+            }],
+        "language": {
+            "url": "/json/italian.json"
+        },
+        "createdRow": function (row, meta) {
+            $(row).children().each(function () { $(this).addClass("text-center align-middle"); });
+        }
+    })
+}
