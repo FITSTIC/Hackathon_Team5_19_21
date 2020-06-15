@@ -19,34 +19,14 @@
     })
 }
 
-function GeneraDataTablePersonale() {
-
-    $("table").DataTable({
-        "paging": true,
-        "searching": true,
-        "columnDefs": [
-        {
-            "targets": [8, 9],
-            "orderable": false,
-            "searchable": false
-        }],
-        "language": {
-            "url": "/json/italian.json"
-        },
-        "createdRow": function (row, meta) {
-            $(row).children().each(function () { $(this).addClass("text-center align-middle"); });
-        }
-    })
-}
-
-function GeneraDataTableCorsi() {
+function GeneraDataTable(posPulsDettaglio, posPulsElimina ) {
 
     $("table").DataTable({
         "paging": true,
         "searching": true,
         "columnDefs": [
             {
-                "targets": [6, 7],
+                "targets": [posPulsDettaglio, posPulsElimina],
                 "orderable": false,
                 "searchable": false
             }],

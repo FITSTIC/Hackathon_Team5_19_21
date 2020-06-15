@@ -45,9 +45,11 @@ namespace Hackathon_Team5_19_21
             //services.AddScoped<AuthenticationStateProvider, RevalidatingIdentityAuthenticationStateProvider<IdentityUser>>();
             services.AddScoped<AuthenticationStateProvider, CustomAuthenticationStateProvider>();
             services.AddScoped<IServizioModuli, ServizioModuli>();
-            services.AddScoped<IServizioPersonaleFitstic, ServizioPersonaleFitstic>();
+            services.AddTransient<IServizioPersonaleFitstic, ServizioPersonaleFitstic>();
             services.AddScoped<IServizioCorsi, ServizioCorsi>();
             services.AddScoped<IServizioCitta, ServizioCitta>();
+            services.AddScoped<IServizioEsami, ServizioEsami>();
+            services.AddScoped<IServizioStudenti, ServizioStudenti>();
             services.AddBlazoredSessionStorage();
         }
 

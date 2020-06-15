@@ -41,7 +41,7 @@
                                 <td class="align-middle">@corso.AnnoFine</td>
                                 <td class="align-middle">@ServizioCitta.GetCittaById(corso.IdCitta).Result.Nome (@ServizioCitta.GetProvinciaByIdCitta(corso.IdCitta).Result.Sigla)</td>
                                 <td class="align-middle">@ServizioPersonaleFitstic.GetPersonaById(corso.IdOrganizzatore).Result.Nome  @ServizioPersonaleFitstic.GetPersonaById(corso.IdOrganizzatore).Result.Cognome </td>
-                                <td class="align-middle"><a href="/corsi/view/@corso.Id" class="btn btn-primary">Modifica</a></td>
+                                <td class="align-middle"><a href="/corsi/view/@corso.Id" class="btn btn-primary">Dettaglio</a></td>
                                 <td class="align-middle"><button type="button" class="btn btn-danger" @onclick="() => BtnElimina_Click(corso)">Elimina</button></td>
                             </tr>
                         }
@@ -70,7 +70,7 @@
 
     protected async override Task OnAfterRenderAsync(bool firstRender)
     {
-        if (firstRender) await JSRuntime.InvokeVoidAsync("GeneraDataTableCorsi");
+        if (firstRender) await JSRuntime.InvokeVoidAsync("GeneraDataTable",6,7);
     }
 
     protected async Task BtnElimina_Click(Corso c)

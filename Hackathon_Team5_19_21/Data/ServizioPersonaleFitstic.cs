@@ -42,21 +42,33 @@ namespace Hackathon_Team5_19_21.Data
             _db.PersonaleFitstic.Remove(p);
             await SalvaCambiamenti();
         }
-
-        public async Task<bool> ControllaRuoli(PersonaFitstic p)
+        private async Task<List<Modulo>> GetModuliDocente(PersonaFitstic p)
         {
-            List<Modulo> moduliDocente = await (from persona in _db.PersonaleFitstic
-                                          join modulo in _db.Moduli on persona.Id equals modulo.IdDocente
-                                          where persona.Id==p.Id
-                                          select modulo).ToListAsync();
-            List<Modulo> moduliTutor = await (from persona in _db.PersonaleFitstic
-                                                      join modulo in _db.Moduli on persona.Id equals modulo.IdTutor
-                                                      where persona.Id == p.Id
-                                                      select modulo).ToListAsync();
-            List<Corso> corsiOrganizzatore = await (from persona in _db.PersonaleFitstic
-                                                     join corso in _db.Corsi on persona.Id equals corso.IdOrganizzatore
-                                                     where persona.Id == p.Id
-                                                     select corso).ToListAsync();
+            return await (from persona in _db.PersonaleFitstic
+                          join modulo in _db.Moduli on persona.Id equals modulo.IdDocente
+                          where persona.Id == p.Id
+                          select modulo).ToListAsync();
+        }
+        private async Task<List<Modulo>> GetModuliTutor(PersonaFitstic p)
+        {
+            return await (from persona in _db.PersonaleFitstic
+                          join modulo in _db.Moduli on persona.Id equals modulo.IdTutor
+                          where persona.Id == p.Id
+                          select modulo).ToListAsync();
+        }
+        private async Task<List<Corso>> GetModuliOrganizzatore(PersonaFitstic p)
+        { 
+            return await (from persona in _db.PersonaleFitstic
+                          join corso in _db.Corsi on persona.Id equals corso.IdOrganizzatore
+                          where persona.Id == p.Id
+                          select corso).ToListAsync();
+        }
+
+            public async Task<bool> ControllaRuoli(PersonaFitstic p)
+        {
+            List<Modulo> moduliDocente = await GetModuliDocente(p);
+            List<Modulo> moduliTutor = await GetModuliTutor(p);
+            List<Corso> corsiOrganizzatore = await GetModuliOrganizzatore(p);
             return !((moduliDocente.Count > 0 && p.Docente == false) || (moduliTutor.Count > 0 && p.Tutor == false) || (corsiOrganizzatore.Count > 0 && p.Organizzatore == false));
 
         }
@@ -74,6 +86,18 @@ namespace Hackathon_Team5_19_21.Data
         public async Task SalvaCambiamenti()
         {
             await _db.SaveChangesAsync();
+        }
+
+        public async Task ReimpostaRuoli(PersonaFitstic p)
+        {
+            List<Modulo> moduliDocente = await GetModuliDocente(p);
+            List<Modulo> moduliTutor = await GetModuliTutor(p);
+            List<Corso> corsiOrganizzatore = await GetModuliOrganizzatore(p);
+
+            p.Docente = moduliDocente.Count > 0;
+            p.Tutor = moduliTutor.Count > 0;
+            p.Organizzatore = corsiOrganizzatore.Count > 0;
+            await SalvaCambiamenti();
         }
     }
 }

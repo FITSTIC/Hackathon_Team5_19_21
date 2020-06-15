@@ -1,0 +1,77 @@
+﻿@layout LoginLayout
+@page "/"
+
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject Blazored.SessionStorage.ISessionStorageService sessionStorage
+<!-- Outer Row -->
+
+<div class="col-lg-6">
+    <div class="p-5">
+        <div class="text-center">
+            <h1 class="h4 text-gray-900 mb-4">Login</h1>
+        </div>
+        <Alert Type="Alert.TypeMessage.Danger" IsVisible="IsVisible">@LoginMessage</Alert>
+        <div class="user">
+            <div class="form-group">
+                <input type="email" class="form-control form-control-user" @bind="Email" required placeholder="Email Address...">
+            </div>
+            <div class="form-group">
+                <input type="password" class="form-control form-control-user" @bind="Password" required placeholder="Password">
+            </div>
+            <button type="button" @onclick="()=>ValidateUser()" class="btn btn-primary btn-user btn-block">
+                Login
+            </button>
+
+        </div>
+        <hr>
+        <div class="text-center">
+            <a class="small" href="recupera-password">Password dimenticata?</a>
+        </div>
+        <div class="text-center">
+            <a class="small" href="reimposta-password">Cambia password</a>
+        </div>
+    </div>
+</div>
+
+
+@code {
+    public string Email { get; set; }
+    public string Password { get; set; }
+    public string LoginMessage { get; set; }
+    public bool IsVisible { get; set; }
+
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationStateTask { get; set; }
+    protected async override Task OnInitializedAsync()
+    {
+        var user = (await authenticationStateTask).User;
+        if (user.Identity.IsAuthenticated) NavigationManager.NavigateTo("/index");
+    }
+
+    private async Task<bool> ValidateUser()
+    {
+        if (Email != "" && Email != null && Password != "" && Password != null)
+        {
+            var result = await ((CustomAuthenticationStateProvider)AuthenticationStateProvider).VerificaCredenziali(Email, Password);
+            if (result != null)
+            {
+                ((CustomAuthenticationStateProvider)AuthenticationStateProvider).MarkUserAsAuthenticated(Email);
+                await sessionStorage.SetItemAsync("email", Email);
+                await sessionStorage.SetItemAsync("admin", result);
+                NavigationManager.NavigateTo(result.PrimaPassword ? "/reimposta-password/"+Email: "/index");
+            }
+            else
+            {
+                IsVisible = true;
+                LoginMessage = "Credenziali Sbagliate";
+            }
+        }
+        else
+        {
+            IsVisible = true;
+            LoginMessage = "Inserire Email e Password";
+        }
+
+        return await Task.FromResult(true);
+    }
+}

@@ -1,6 +1,6 @@
 ﻿@if (IsVisible)
 {
-    <div class="alert alert-@Classe">
+    <div class="alert alert-@Classe d-flex flex-row justify-content-between align-items-center">
         @ChildContent
         <button type="button" class="close" @onclick="(() => Chiudi())">
             <span>&times;</span>
@@ -17,7 +17,7 @@
     [Parameter]
     public RenderFragment ChildContent { get; set; }
 
-    protected override void OnInitialized()
+    protected override void OnParametersSet()
     {
         switch (Type)
         {

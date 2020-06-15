@@ -1,0 +1,87 @@
+﻿@page "/iscrizioni"
+
+@inject IServizioCorsi ServizioCorsi
+@inject IServizioStudenti ServizioStudenti
+
+
+<h1>Iscrizioni</h1>
+
+<p>Visualizza i moduli</p>
+@if (corsi != null)
+{
+    @foreach (var corso in corsi)
+    {
+        <div class="card shadow mb-4">
+            <div class="card-header py-3 d-flex flex-row justify-content-between align-items-center">
+                <h6 class="m-0 font-weight-bold text-primary">@corso.Nome @corso.AnnoInizio - @corso.AnnoFine</h6>
+                <a href="/iscrizioni/create/@corso.Id" class="btn btn-success">Aggiungi</a>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table id="elencoModuli" class="table table-bordered" width="100%" cellspacing="0">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Nome</th>
+                                <th>Cognome</th>
+                                <th>Data Iscrizione</th>
+                                <th>Non Ammesso</th>
+                                <th>Ritirato</th>
+                                <th>Voto Finale</th>
+                                <th></th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var studente in ServizioStudenti.GetStudentiDelCorso(corso).Result)
+                            {
+                                <tr>
+                                    <td>@studente.Id</td>
+                                    <td>@studente.Nome</td>
+                                    <td>@studente.Cognome</td>
+                                    <td>@studente.DataIscrizione</td>
+                                    <td>@studente.NonAmmesso</td>
+                                    <td>@studente.Ritirato</td>
+                                    <td>@studente.VotoFinale</td>
+                                    <td><a href="/iscrizioni/view/@studente.Id" class="btn btn-primary">Dettaglio</a></td>
+                                    <td><button type="button" class="btn btn-danger" @onclick="() => BtnElimina_Click(studente)">Elimina</button></td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    }
+}
+
+@code {
+
+    List<Corso> corsi;
+
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationStateTask { get; set; }
+
+    protected async override Task OnInitializedAsync()
+    {
+        var user = (await authenticationStateTask).User;
+        if (user.Identity.IsAuthenticated)
+        {
+            corsi = await ServizioCorsi.GetCorsiAttuali();
+        }
+        else NavigationManager.NavigateTo("/");
+
+    }
+    protected async override Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender) await JSRuntime.InvokeVoidAsync("GeneraDataTable",7,8);
+    }
+
+    protected async Task BtnElimina_Click(dynamic studente)
+    {
+        await ServizioStudenti.EliminaIscrizione(studente.Id);
+        StateHasChanged();
+
+    }
+
+}

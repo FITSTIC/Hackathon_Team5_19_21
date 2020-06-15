@@ -1,9 +1,12 @@
 ﻿@page "/moduli/create/{IdCorso:int}"
 @page "/moduli/view/{Id:int}"
+@page "/corsi/{IdCorso:int}/moduli/create"
+@page "/corsi/{IdCorso:int}/moduli/view/{Id:int}"
 
 @inject IServizioModuli ServizioModuli
 @inject IServizioCorsi ServizioCorsi
 @inject IServizioPersonaleFitstic ServizioPersonaleFitstic
+@inject IServizioEsami ServizioEsami
 
 <h1>Moduli</h1>
 @if (Id == null)
@@ -14,7 +17,7 @@ else
 {
     <p>Modifica un modulo</p>
 }
-<div class="container">
+<div class="container mb-4">
     <EditForm Model="@Modulo" OnValidSubmit="() => Form_OnSubmit()">
         <DataAnnotationsValidator />
         <ValidationSummary />
@@ -44,22 +47,22 @@ else
         </div>
         @if (Id != null)
         {
-        <div class="input-group mb-3">
-            <div class="input-group-prepend">
-                <label class="input-group-text">Corso</label>
-            </div>
-            <select class="custom-select" @bind="Modulo.IdCorso">
-                @if (Id == null)
-                {
-                    <option value="0">Seleziona un corso</option>
-                }
-                @foreach (var corso in corsi)
-                {
-                    <option value="@corso.Id">@corso.Nome @corso.AnnoInizio - @corso.AnnoFine</option>
+            <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                    <label class="input-group-text">Corso</label>
+                </div>
+                <select class="custom-select" @bind="Modulo.IdCorso">
+                    @if (Id == null)
+                    {
+                        <option value="0">Seleziona un corso</option>
+                    }
+                    @foreach (var corso in corsi)
+                    {
+                        <option value="@corso.Id">@corso.Nome @corso.AnnoInizio - @corso.AnnoFine</option>
 
-                }
-            </select>
-        </div>
+                    }
+                </select>
+            </div>
         }
         <div class="input-group mb-3">
             <div class="input-group-prepend">
@@ -92,23 +95,79 @@ else
             </select>
         </div>
         <div class="text-right">
-            <a href="/moduli" class="btn btn-secondary">Annulla</a>
             <button type="submit" class="btn btn-success">Salva</button>
         </div>
     </EditForm>
 </div>
+@if (Id != null)
+{
+    <hr />
+    <h1>Voti</h1>
+
+    <p>Visualizza i voti</p>
+
+    <div class="card shadow mb-4">
+        <div class="card-header py-3 d-flex flex-row justify-content-between align-items-center">
+            <h6 class="m-0 font-weight-bold text-primary">Voti</h6>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered text-center">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nome</th>
+                            <th>Cognome</th>
+                            <th>Data Nascita</th>
+                            <th>Voto</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (voti != null && voti.Count > 0)
+                        {
+                            @foreach (var x in voti)
+                            {
+                                <tr>
+                                    <td class="align-middle">@x.Id</td>
+                                    <td class="align-middle">@x.Nome</td>
+                                    <td class="align-middle">@x.Cognome</td>
+                                    <td class="align-middle">@x.DataNascita.ToShortDateString()</td>
+                                    @if (x.IsEditing == false)
+                                    {
+                                        <td class="align-middle" @ondblclick="() => Td_DoubleClick(x)">@x.Voto</td>
+                                    }
+                                    else
+                                    {
+                                        <td class="align-middle">
+                                            <div class="form-inline">
+                                                <input type="number" @bind="@x.Voto" class="form-control mr-1" />
+                                                <button type="button" class="btn btn-primary" @onclick="()=>Voto_Submit(x)">Salva</button>
+                                            </div>
+                                        </td>
+                                    }
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+}
+
 
 @code {
     [Parameter]
     public int? Id { get; set; }
     [Parameter]
-    public int IdCorso { get; set; }
+    public int? IdCorso { get; set; }
 
     public Modulo Modulo { get; set; }
     List<Modulo> moduli;
     List<Corso> corsi;
     List<PersonaFitstic> docenti;
     List<PersonaFitstic> tutors;
+    List<IServizioEsami.RisultatoQuery> voti;
 
     [CascadingParameter]
     private Task<AuthenticationState> authenticationStateTask { get; set; }
@@ -122,7 +181,8 @@ else
             corsi = await ServizioCorsi.GetCorsi();
             docenti = await ServizioPersonaleFitstic.GetDocenti();
             tutors = await ServizioPersonaleFitstic.GetTutor();
-            Modulo = Id == null ? new Modulo { DataInizio = DateTime.Now, IdCorso=IdCorso } : await ServizioModuli.GetModuloById((int)Id);
+            if (Id != null) voti = await ServizioEsami.GetEsamiByIdModulo((int)Id);
+            Modulo = Id == null ? new Modulo { DataInizio = DateTime.Now, IdCorso = (int)IdCorso } : await ServizioModuli.GetModuloById((int)Id);
         }
         else NavigationManager.NavigateTo("/");
 
@@ -132,6 +192,20 @@ else
         if (Id == null) await ServizioModuli.SalvaModulo(Modulo);
         else await ServizioModuli.SalvaCambiamenti();
         StateHasChanged();
-        NavigationManager.NavigateTo("/moduli");
+        if (NavigationManager.Uri.Contains("/corsi/"+IdCorso+"/moduli/view/"+Id) || NavigationManager.Uri.Contains("/corsi/" + IdCorso + "/moduli/create")) NavigationManager.NavigateTo("/corsi/view/" + IdCorso);
+        else NavigationManager.NavigateTo("/moduli");
+    }
+    public void Td_DoubleClick(IServizioEsami.RisultatoQuery x)
+    {
+        x.IsEditing = true;
+    }
+    public async Task Voto_Submit(IServizioEsami.RisultatoQuery x)
+    {
+        if (x.Voto >= 0 && x.Voto <= 100)
+        {
+            await ServizioEsami.SalvaEsame(x.Id, (int)Id, x.Voto);
+            voti = await ServizioEsami.GetEsamiByIdModulo((int)Id);
+            StateHasChanged();
+        }
     }
 }

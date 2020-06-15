@@ -19,5 +19,6 @@ namespace Hackathon_Team5_19_21.Data
         Task<bool> ControllaRuoli(PersonaFitstic p);
         Task<Amministratore> GetAdminByEmail(string email);
         Task SalvaCambiamenti();
+        Task ReimpostaRuoli(PersonaFitstic p);
     }
 }

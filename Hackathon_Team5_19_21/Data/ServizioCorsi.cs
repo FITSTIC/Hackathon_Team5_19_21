@@ -36,5 +36,10 @@ namespace Hackathon_Team5_19_21.Data
         {
             await _db.SaveChangesAsync();
         }
+
+        public async Task<List<Corso>> GetCorsiAttuali()
+        {
+            return await _db.Corsi.Where(x=>x.AnnoFine>=DateTime.Now.Year).OrderByDescending(x => x.AnnoInizio).ThenBy(x => x.Id).ToListAsync();
+        }
     }
 }

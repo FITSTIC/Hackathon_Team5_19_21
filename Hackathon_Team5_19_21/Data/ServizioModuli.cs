@@ -64,5 +64,10 @@ namespace Hackathon_Team5_19_21.Data
         {
             await _db.SaveChangesAsync();
         }
+
+        public async Task<List<Modulo>> GetModuliDelCorso(int idCorso)
+        {
+            return await _db.Moduli.Where(x => x.IdCorso == idCorso).ToListAsync();
+        }
     }
 }

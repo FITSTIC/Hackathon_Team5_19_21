@@ -1,52 +1,167 @@
-﻿@page "/dettaglio-studente/{IdStudente}"
+﻿@page "/studenti/create"
+@page "/studenti/view/{Id:int}"
 
-@using Hackathon_Team5_19_21.Data
-@using Microsoft.EntityFrameworkCore
-@inject ApplicationDbContext db
-@using System.Linq;
+@inject IServizioCitta ServizioCitta
+@inject IServizioStudenti ServizioStudenti 
 
-<h1>Weather forecast</h1>
-
-<p>This component demonstrates fetching data from a service.</p>
-
-@if (studente == null)
+<h1>Moduli</h1>
+@if (Id == null)
 {
-    <p><em>Loading...</em></p>
+    <p>Aggiungi un nuovo studente</p>
 }
 else
 {
-
-    <table class="table table-bordered">
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Nome</th>
-                <th>Cognome</th>
-                <th>Email</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td>@studente.Id</td>
-                <td>@studente.Nome</td>
-                <td>@studente.Cognome</td>
-                <td>@studente.Email</td>
-            </tr>
-        </tbody>
-
-    </table>
+    <p>Modifica uno studente</p>
 }
+<div class="container mb-4">
+    <EditForm Model="@Studente" OnValidSubmit="() => Form_OnSubmit()">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+        <div class="input-group mb-3">
+            <div class="input-group-prepend">
+                <span class="input-group-text">Nome</span>
+            </div>
+            <InputText class="form-control" @bind-Value="Studente.Nome"></InputText>
+        </div>
+        <div class="input-group mb-3">
+            <div class="input-group-prepend">
+                <span class="input-group-text">Cognome</span>
+            </div>
+            <InputText class="form-control" @bind-Value="Studente.Cognome"></InputText>
+        </div>
+        <div class="input-group mb-3">
+            <div class="input-group-prepend">
+                <span class="input-group-text">Data Nascita</span>
+            </div>
+            <InputDate class="form-control" @bind-Value="Studente.DataNascita"></InputDate>
+        </div>
+        <div class="input-group mb-3">
+            <div class="input-group-prepend">
+                <span class="input-group-text">Anno Diploma</span>
+            </div>
+            <InputNumber class="form-control" @bind-Value="Studente.AnnoDiploma"></InputNumber>
+        </div>
+        <div class="input-group mb-3">
+            <div class="input-group-prepend">
+                <span class="input-group-text">Tipo Diploma</span>
+            </div>
+            <select class="form-control" @bind="Studente.TipoDiploma">
+                <option value="NessunDiploma">Seleziona un diploma</option>
+                <option value="DiplomaMaturita">Diploma di Maturità</option>
+                <option value="LaureaTriennale">Laurea Triennale</option>
+                <option value="LaureaMagistrale">Laurea Magistrale</option>
+                <option value="DottoratoDiRicerca">Dottorato di Ricerca</option>
+            </select>
+        </div>
+        <div class="input-group mb-3">
+            <div class="input-group-prepend">
+                <span class="input-group-text">Indirizzo</span>
+            </div>
+            <InputText class="form-control" @bind-Value="Studente.Indirizzo"></InputText>
+        </div>
+        <div class="input-group mb-3">
+            <div class="input-group-prepend">
+                <span class="input-group-text">Civico</span>
+            </div>
+            <InputText class="form-control" @bind-Value="Studente.Civico"></InputText>
+        </div>
+        <div class="input-group mb-3">
+            <div class="input-group-prepend">
+                <label class="input-group-text">Provincia</label>
+            </div>
+            <select class="custom-select" @onchange="(e)=>Provincia_OnChange(e)">
+                @if (Id == null)
+                {
+                    <option selected value="0">Seleziona una provincia</option>
+                    @foreach (var provincia in province)
+                    {
+                        <option value="@provincia.Id">@provincia.Nome</option>
+                    }
+                }
+                else
+                {
+                    @foreach (var provincia in province)
+                    {
+                        @if (provincia.Id == ServizioCitta.GetProvinciaByIdCitta(Studente.IdCitta).Result.Id)
+                        {
+                            <option selected value="@provincia.Id">@provincia.Nome</option>
+                        }
+                        else
+                        {
+                            <option value="@provincia.Id">@provincia.Nome</option>
+                        }
+                    }
+                }
+            </select>
+        </div>
+        <div class="input-group mb-3">
+            <div class="input-group-prepend">
+                <label class="input-group-text">Citta</label>
+            </div>
+            <select class="custom-select" @bind="Studente.IdCitta">
+                @if (Id == null)
+                {
+                    <option value="0">Seleziona una citta</option>
+                }
+                @foreach (var citta in cittas)
+                {
+                    <option value="@citta.Id">@citta.Nome</option>
+                }
+            </select>
+        </div>
+        <div class="input-group mb-3">
+            <div class="input-group-prepend">
+                <span class="input-group-text">Email</span>
+            </div>
+            <InputText type="email" class="form-control" @bind-Value="Studente.Email"></InputText>
+        </div>
+        <div class="input-group mb-3">
+            <div class="input-group-prepend">
+                <span class="input-group-text">Telefono</span>
+            </div>
+            <InputText class="form-control" @bind-Value="Studente.Telefono"></InputText>
+        </div>
+        <div class="text-right">
+            <button type="submit" class="btn btn-success">Salva</button>
+        </div>
+    </EditForm>
+</div>
+
 
 @code {
     [Parameter]
-    public string IdStudente { get; set; }
-    public Studente studente;
+    public int? Id { get; set; }
 
-    protected override async Task OnInitializedAsync()
+    Studente Studente { get; set; }
+    List<Provincia> province;
+    List<Citta> cittas;
+
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationStateTask { get; set; }
+
+    protected async override Task OnInitializedAsync()
     {
-        int id;
-        bool ok = int.TryParse(IdStudente, out id);
-        if (int.TryParse(IdStudente, out id)) studente = await db.Studenti.FindAsync(id);
-        
+        var user = (await authenticationStateTask).User;
+        if (user.Identity.IsAuthenticated)
+        {
+            province = await ServizioCitta.GetProvince();
+            Studente = Id == null ? new Studente { DataNascita = DateTime.Now, AnnoDiploma=DateTime.Now.Year, Password=""} : await ServizioStudenti.GetStudenteById((int)Id);
+            cittas = Id != null ? await ServizioCitta.GetCittaByIdProvicia(ServizioCitta.GetProvinciaByIdCitta(Studente.IdCitta).Result.Id) : new List<Citta>();
+        }
+        else NavigationManager.NavigateTo("/");
+
+    }
+    protected async Task Form_OnSubmit()
+    {
+        if (Id == null) await ServizioStudenti.SalvaStudente(Studente);
+        else await ServizioStudenti.SalvaCambiamenti();
+        StateHasChanged();
+        NavigationManager.NavigateTo("/studenti");
+    }
+    protected async Task Provincia_OnChange(ChangeEventArgs e)
+    {
+        int idProv;
+        Studente.IdCitta = 0;
+        if (int.TryParse(e.Value.ToString(), out idProv)) cittas = await ServizioCitta.GetCittaByIdProvicia(idProv);
     }
 }

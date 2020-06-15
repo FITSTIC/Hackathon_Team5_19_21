@@ -21,7 +21,6 @@ namespace Hackathon_Team5_19_21.Data
         public Studente Studente { get; set; }
         [Required]
         public int IdStudente { get; set; }
-        [Required]
         public Corso Corso { get; set; }
         [Required]
         public int IdCorso { get; set; }

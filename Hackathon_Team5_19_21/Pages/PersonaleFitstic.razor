@@ -13,7 +13,7 @@
     </div>
     <div class="card-body">
         <div class="table-responsive">
-            <table id="elencoPersonale" class="table table-bordered text-center">
+            <table class="table table-bordered text-center">
                 <thead>
                     <tr>
                         <th>ID</th>
@@ -21,9 +21,7 @@
                         <th>Cognome</th>
                         <th>Data Nascita</th>
                         <th>Data Assunzione</th>
-                        <th>Docente</th>
-                        <th>Organizzatore</th>
-                        <th>Tutor</th>
+                        <th>Ruolo</th>
                         <th></th>
                         <th></th>
                     </tr>
@@ -33,18 +31,47 @@
                     {
                         @foreach (var persona in personale)
                         {
-                            <tr>
-                                <td class="align-middle">@persona.Id</td>
-                                <td class="align-middle">@persona.Nome</td>
-                                <td class="align-middle">@persona.Cognome</td>
-                                <td class="align-middle">@persona.DataNascita.ToShortDateString()</td>
-                                <td class="align-middle">@persona.DataAssunzione.ToShortDateString()</td>
-                                <td class="align-middle">@persona.Docente</td>
-                                <td class="align-middle">@persona.Organizzatore</td>
-                                <td class="align-middle">@persona.Tutor</td>
-                                <td class="align-middle"><a href="/personale/view/@persona.Id" class="btn btn-primary">Modifica</a></td>
-                                <td class="align-middle"><button type="button" class="btn btn-danger" @onclick="() => BtnElimina_Click(persona)">Elimina</button></td>
-                            </tr>
+                    <tr>
+                        <td class="align-middle">@persona.Id</td>
+                        <td class="align-middle">@persona.Nome</td>
+                        <td class="align-middle">@persona.Cognome</td>
+                        <td class="align-middle">@persona.DataNascita.ToShortDateString()</td>
+                        <td class="align-middle">@persona.DataAssunzione.ToShortDateString()</td>
+                        @if (persona.Docente == true && persona.Tutor == true && persona.Organizzatore == true)
+                        {
+                            <td class="align-middle">Docente, Tutor, Organizzatore</td>
+                        }
+                        else if (persona.Docente == true && persona.Tutor == true && persona.Organizzatore == false)
+                        {
+                            <td class="align-middle">Docente, Tutor</td>
+                        }
+                        else if (persona.Docente == true && persona.Tutor == false && persona.Organizzatore == true)
+                        {
+                            <td class="align-middle">Docente, Organizzatore</td>
+                        }
+                        else if (persona.Docente == true && persona.Tutor == false && persona.Organizzatore == false)
+                        {
+                            <td class="align-middle">Docente</td>
+                        }
+                        else if (persona.Docente == false && persona.Tutor == true && persona.Organizzatore == true)
+                        {
+                            <td class="align-middle">Tutor, Organizzatore</td>
+                        }
+                        else if (persona.Docente == false && persona.Tutor == true && persona.Organizzatore == false)
+                        {
+                            <td class="align-middle">Tutor</td>
+                        }
+                        else if (persona.Docente == false && persona.Tutor == false && persona.Organizzatore == true)
+                        {
+                            <td class="align-middle">Organizzatore</td>
+                        }
+                        else if (persona.Docente == false && persona.Tutor == false && persona.Organizzatore == false)
+                        {
+                            <td class="align-middle">Nessun Ruolo</td>
+                        }
+                        <td class="align-middle"><a href="/personale/view/@persona.Id" class="btn btn-primary">Dettaglio</a></td>
+                        <td class="align-middle"><button type="button" class="btn btn-danger" @onclick="() => BtnElimina_Click(persona)">Elimina</button></td>
+                    </tr>
                         }
                     }
                 </tbody>
@@ -68,7 +95,7 @@
     }
     protected async override Task OnAfterRenderAsync(bool firstRender)
     {
-        if (firstRender) await JSRuntime.InvokeVoidAsync("GeneraDataTablePersonale");
+        if (firstRender) await JSRuntime.InvokeVoidAsync("GeneraDataTable",6,7);
     }
 
     protected async Task BtnElimina_Click(PersonaFitstic p)
