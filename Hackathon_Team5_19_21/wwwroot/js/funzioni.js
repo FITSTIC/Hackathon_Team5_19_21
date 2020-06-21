@@ -1,40 +1,16 @@
-﻿function GeneraDataTableModuli() {
-    $("table").each(function () {
-        $(this).DataTable({
-            "paging": true,
-            "searching": true,
-            "columnDefs": [
-                {
-                    "targets": [7, 8],
-                    "orderable": false,
-                    "searchable": false
-                }],
-            "language": {
-                "url": "/json/italian.json"
-            },
-            "createdRow": function (row) {
-                $(row).children().each(function () { $(this).addClass("text-center align-middle"); });
-            }
-        })
-    })
-}
-
-function GeneraDataTable(posPulsDettaglio, posPulsElimina ) {
-
-    $("table").DataTable({
-        "paging": true,
-        "searching": true,
-        "columnDefs": [
+﻿function GeneraDataTable(a, idTab) {
+    $(idTab == undefined ? "table" : idTab).DataTable({
+        serverSide: !1,
+        processing: !1,
+        paging: !0,
+        searching: !0,
+        columnDefs: [
             {
-                "targets": [posPulsDettaglio, posPulsElimina],
-                "orderable": false,
-                "searchable": false
+                targets: [a], orderable: !1, searchable: !1
             }],
-        "language": {
-            "url": "/json/italian.json"
-        },
-        "createdRow": function (row, meta) {
-            $(row).children().each(function () { $(this).addClass("text-center align-middle"); });
-        }
+        language: { url: "/json/italian.json" },
+        createdRow: function (a) { $(a).children().each(function () { $(this).addClass("text-center align-middle") }) }
     })
+
 }
+

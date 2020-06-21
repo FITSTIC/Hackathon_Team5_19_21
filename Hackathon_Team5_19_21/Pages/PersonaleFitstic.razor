@@ -2,86 +2,36 @@
 
 @inject IServizioPersonaleFitstic ServizioPersonaleFitstic
 
-<h1>Personale</h1>
-
-<p>Visualizza il personale</p>
-
-<div class="card shadow mb-4">
-    <div class="card-header py-3 d-flex flex-row justify-content-between align-items-center">
+<h1 class="mb-4">Personale</h1>
+<Card>
+    <CardHeader>
         <h6 class="m-0 font-weight-bold text-primary">Personale Fitstic</h6>
         <a href="/personale/create" class="btn btn-success">Aggiungi</a>
-    </div>
-    <div class="card-body">
-        <div class="table-responsive">
-            <table class="table table-bordered text-center">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Nome</th>
-                        <th>Cognome</th>
-                        <th>Data Nascita</th>
-                        <th>Data Assunzione</th>
-                        <th>Ruolo</th>
-                        <th></th>
-                        <th></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @if (personale != null)
-                    {
-                        @foreach (var persona in personale)
-                        {
-                    <tr>
-                        <td class="align-middle">@persona.Id</td>
-                        <td class="align-middle">@persona.Nome</td>
-                        <td class="align-middle">@persona.Cognome</td>
-                        <td class="align-middle">@persona.DataNascita.ToShortDateString()</td>
-                        <td class="align-middle">@persona.DataAssunzione.ToShortDateString()</td>
-                        @if (persona.Docente == true && persona.Tutor == true && persona.Organizzatore == true)
-                        {
-                            <td class="align-middle">Docente, Tutor, Organizzatore</td>
-                        }
-                        else if (persona.Docente == true && persona.Tutor == true && persona.Organizzatore == false)
-                        {
-                            <td class="align-middle">Docente, Tutor</td>
-                        }
-                        else if (persona.Docente == true && persona.Tutor == false && persona.Organizzatore == true)
-                        {
-                            <td class="align-middle">Docente, Organizzatore</td>
-                        }
-                        else if (persona.Docente == true && persona.Tutor == false && persona.Organizzatore == false)
-                        {
-                            <td class="align-middle">Docente</td>
-                        }
-                        else if (persona.Docente == false && persona.Tutor == true && persona.Organizzatore == true)
-                        {
-                            <td class="align-middle">Tutor, Organizzatore</td>
-                        }
-                        else if (persona.Docente == false && persona.Tutor == true && persona.Organizzatore == false)
-                        {
-                            <td class="align-middle">Tutor</td>
-                        }
-                        else if (persona.Docente == false && persona.Tutor == false && persona.Organizzatore == true)
-                        {
-                            <td class="align-middle">Organizzatore</td>
-                        }
-                        else if (persona.Docente == false && persona.Tutor == false && persona.Organizzatore == false)
-                        {
-                            <td class="align-middle">Nessun Ruolo</td>
-                        }
-                        <td class="align-middle"><a href="/personale/view/@persona.Id" class="btn btn-primary">Dettaglio</a></td>
-                        <td class="align-middle"><button type="button" class="btn btn-danger" @onclick="() => BtnElimina_Click(persona)">Elimina</button></td>
-                    </tr>
-                        }
-                    }
-                </tbody>
-            </table>
-        </div>
-    </div>
-</div>
-
+    </CardHeader>
+    <CardBody>
+        <Table Items="personale">
+            <TableHeader>
+                <th>ID</th>
+                <th>Nome</th>
+                <th>Cognome</th>
+                <th>Data Nascita</th>
+                <th>Data Assunzione</th>
+                <th>Ruolo</th>
+                <th></th>
+            </TableHeader>
+            <RowTemplate>
+                <td>@context.Id</td>
+                <td>@context.Nome</td>
+                <td>@context.Cognome</td>
+                <td>@context.DataNascita.ToShortDateString()</td>
+                <td>@context.DataAssunzione.ToShortDateString()</td>
+                <td>@ServizioPersonaleFitstic.Ruoli(context)</td>
+                <td><a href="/personale/view/@context.Id" class="btn btn-primary">Dettaglio</a></td>
+            </RowTemplate>
+        </Table>
+    </CardBody>
+</Card>
 @code {
-
     List<PersonaFitstic> personale;
 
     [CascadingParameter]
@@ -95,15 +45,6 @@
     }
     protected async override Task OnAfterRenderAsync(bool firstRender)
     {
-        if (firstRender) await JSRuntime.InvokeVoidAsync("GeneraDataTable",6,7);
+        if (firstRender) await JSRuntime.InvokeVoidAsync("GeneraDataTable", 6);
     }
-
-    protected async Task BtnElimina_Click(PersonaFitstic p)
-    {
-        await ServizioPersonaleFitstic.EliminaPersona(p);
-        personale = await ServizioPersonaleFitstic.GetPersonale();
-        StateHasChanged();
-
-    }
-
 }

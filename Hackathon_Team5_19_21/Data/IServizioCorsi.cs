@@ -9,8 +9,8 @@ namespace Hackathon_Team5_19_21.Data
     {
         Task<List<Corso>> GetCorsi();
         Task<List<Corso>> GetCorsiAttuali();
-        Task EliminaCorso(Corso c);
-        Task SalvaCorso(Corso c);
+        Task<bool> EliminaCorso(Corso c);
+        Task<bool> SalvaCorso(Corso c);
         Task<Corso> CorsoById(int id);
         Task SalvaCambiamenti();
     }

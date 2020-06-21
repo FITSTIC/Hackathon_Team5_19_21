@@ -1,0 +1,13 @@
+﻿<div class="input-group mb-3">
+    <div class="input-group-prepend">
+        <span class="input-group-text">@Text</span>
+    </div>
+    @ChildContent
+</div>
+
+@code {
+    [Parameter]
+    public string Text { get; set; }
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+}

@@ -17,17 +17,17 @@ namespace Hackathon_Team5_19_21.Data
         {
             List<IServizioEsami.RisultatoQuery> voti = new List<IServizioEsami.RisultatoQuery>();
 
-            var votiStudenti = await(from studente in _db.Studenti
-                           join studenteIscritto in _db.StudentiIscritti on studente.Id equals studenteIscritto.IdStudente
-                           join esame in _db.Esami on studenteIscritto.Id equals esame.IdStudenteIscritto
-                           where studenteIscritto.Ritirato==false && studenteIscritto.NonAmmesso==false && esame.IdModulo==Id
-                           select new IServizioEsami.RisultatoQuery { Id = studenteIscritto.Id, Nome = studente.Nome, Cognome = studente.Cognome, DataNascita = studente.DataNascita, Voto = esame.Voto, IsEditing = false }).ToListAsync();
+            var votiStudenti = await (from studente in _db.Studenti
+                                      join studenteIscritto in _db.StudentiIscritti on studente.Id equals studenteIscritto.IdStudente
+                                      join esame in _db.Esami on studenteIscritto.Id equals esame.IdStudenteIscritto
+                                      where studenteIscritto.Ritirato == false && studenteIscritto.NonAmmesso == false && esame.IdModulo == Id
+                                      select new IServizioEsami.RisultatoQuery { Id = studenteIscritto.Id, Nome = studente.Nome, Cognome = studente.Cognome, DataNascita = studente.DataNascita, Voto = esame.Voto, DataEsame=esame.Data, IsEditing = false }).ToListAsync();
 
-            var studentiCorso = await(from studente in _db.Studenti
-                           join studenteIscritto in _db.StudentiIscritti on studente.Id equals studenteIscritto.IdStudente
-                           join corso in _db.Corsi on studenteIscritto.IdCorso equals corso.Id
-                           where studenteIscritto.Ritirato == false && studenteIscritto.NonAmmesso == false
-                           select new IServizioEsami.RisultatoQuery { Id = studenteIscritto.Id, Nome = studente.Nome, Cognome = studente.Cognome, DataNascita=studente.DataNascita, Voto = 0, IsEditing = false }).ToListAsync();
+            var studentiCorso = await (from studente in _db.Studenti
+                                       join studenteIscritto in _db.StudentiIscritti on studente.Id equals studenteIscritto.IdStudente
+                                       join corso in _db.Corsi on studenteIscritto.IdCorso equals corso.Id
+                                       where studenteIscritto.Ritirato == false && studenteIscritto.NonAmmesso == false
+                                       select new IServizioEsami.RisultatoQuery { Id = studenteIscritto.Id, Nome = studente.Nome, Cognome = studente.Cognome, DataNascita = studente.DataNascita, Voto = 0, DataEsame = null, IsEditing = false }).ToListAsync();
 
             foreach (var studente in studentiCorso)
             {
@@ -38,17 +38,30 @@ namespace Hackathon_Team5_19_21.Data
             return voti;
         }
 
-        public async Task SalvaEsame(int idStudIscritto, int idModulo, int voto)
+        public async Task<List<Esame>> GetEsamiUltimoAnno()
         {
-            var q1 = await(from studente in _db.Studenti
-                           join studenteIscritto in _db.StudentiIscritti on studente.Id equals studenteIscritto.IdStudente
-                           join esame in _db.Esami on studenteIscritto.Id equals esame.IdStudenteIscritto
-                           where studenteIscritto.Id == idStudIscritto && esame.IdModulo == idModulo
-                           select esame).ToListAsync();
-            if (q1.Count == 0) await _db.Esami.AddAsync(new Esame { IdModulo = idModulo, Voto = voto, IdStudenteIscritto = idStudIscritto });
-            else q1[0].Voto = voto;
+            return await _db.Esami.Where(x => x.Data >= DateTime.Now.AddYears(-1)).ToListAsync();
+        }
 
-            await _db.SaveChangesAsync();
+        public async Task<bool> SalvaEsame(int idStudIscritto, int idModulo, int voto, DateTime? data)
+        {
+            bool result = false;
+            Modulo m = await _db.Moduli.FindAsync(idModulo);
+            StudenteIscritto studIscr = await _db.StudentiIscritti.FindAsync(idStudIscritto);
+            if(m!=null && studIscr != null && voto>=0 && voto<=100)
+            {
+                var q1 = await (from studente in _db.Studenti
+                                join studenteIscritto in _db.StudentiIscritti on studente.Id equals studenteIscritto.IdStudente
+                                join esame in _db.Esami on studenteIscritto.Id equals esame.IdStudenteIscritto
+                                where studenteIscritto.Id == idStudIscritto && esame.IdModulo == idModulo
+                                select esame).ToListAsync();
+                if (q1.Count == 0) _db.Esami.Add(new Esame { IdModulo = idModulo, Voto = voto, IdStudenteIscritto = idStudIscritto, Data = data });
+                else { q1[0].Voto = voto; q1[0].Data = data; }
+
+                await _db.SaveChangesAsync();
+                result = true;
+            }
+            return result;
         }
     }
 }

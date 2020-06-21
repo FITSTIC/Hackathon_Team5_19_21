@@ -1,57 +1,83 @@
-﻿@if (IsVisible)
+﻿@if (Model.IsVisible)
 {
-    <div class="alert alert-@Classe d-flex flex-row justify-content-between align-items-center">
-        @ChildContent
-        <button type="button" class="close" @onclick="(() => Chiudi())">
-            <span>&times;</span>
-        </button>
-    </div>
+    switch (Model.TypeMessage)
+    {
+        case Color.Danger:
+            <div class="alert alert-danger d-flex flex-row justify-content-between align-items-center">
+                @Model.Message
+                <button type="button" class="close" @onclick="()=>ChiudiAlert()">
+                    <span>&times;</span>
+                </button>
+            </div>
+            break;
+        case Color.Warning:
+            <div class="alert alert-warning d-flex flex-row justify-content-between align-items-center">
+                @Model.Message
+                <button type="button" class="close" @onclick="()=>ChiudiAlert()">
+                    <span>&times;</span>
+                </button>
+            </div>
+            break;
+        case Color.Success:
+            <div class="alert alert-success d-flex flex-row justify-content-between align-items-center">
+                @Model.Message
+                <button type="button" class="close" @onclick="()=>ChiudiAlert()">
+                    <span>&times;</span>
+                </button>
+            </div>
+            break;
+        case Color.Primary:
+            <div class="alert alert-primary d-flex flex-row justify-content-between align-items-center">
+                @Model.Message
+                <button type="button" class="close" @onclick="()=>ChiudiAlert()">
+                    <span>&times;</span>
+                </button>
+            </div>
+            break;
+        case Color.Info:
+            <div class="alert alert-info d-flex flex-row justify-content-between align-items-center">
+                @Model.Message
+                <button type="button" class="close" @onclick="()=>ChiudiAlert()">
+                    <span>&times;</span>
+                </button>
+            </div>
+            break;
+        case Color.Dark:
+            <div class="alert alert-dark d-flex flex-row justify-content-between align-items-center">
+                @Model.Message
+                <button type="button" class="close" @onclick="()=>ChiudiAlert()">
+                    <span>&times;</span>
+                </button>
+            </div>
+            break;
+        case Color.Secondary:
+            <div class="alert alert-secondary d-flex flex-row justify-content-between align-items-center">
+                @Model.Message
+                <button type="button" class="close" @onclick="()=>ChiudiAlert()">
+                    <span>&times;</span>
+                </button>
+            </div>
+            break;
+        case Color.Light:
+            <div class="alert alert-light d-flex flex-row justify-content-between align-items-center">
+                @Model.Message
+                <button type="button" class="close" @onclick="()=>ChiudiAlert()">
+                    <span>&times;</span>
+                </button>
+            </div>
+            break;
+    }
 }
 
 @code {
-    public enum TypeMessage { Danger, Warning, Success, Primary, Secondary, Info, Light, Dark }
+    
     [Parameter]
-    public TypeMessage Type { get; set; }
-    [Parameter]
-    public bool IsVisible { get; set; }
-    [Parameter]
-    public RenderFragment ChildContent { get; set; }
+    public AlertSettings Model { get; set; }
 
-    protected override void OnParametersSet()
+    public void ChiudiAlert()
     {
-        switch (Type)
-        {
-            case TypeMessage.Danger:
-                Classe = "danger";
-                break;
-            case TypeMessage.Warning:
-                Classe = "warning";
-                break;
-            case TypeMessage.Success:
-                Classe = "success";
-                break;
-            case TypeMessage.Primary:
-                Classe = "primary";
-                break;
-            case TypeMessage.Info:
-                Classe = "info";
-                break;
-            case TypeMessage.Dark:
-                Classe = "dark";
-                break;
-            case TypeMessage.Secondary:
-                Classe = "secondary";
-                break;
-            case TypeMessage.Light:
-                Classe = "light";
-                break;
-        }
+        Model.IsVisible = false;
+        StateHasChanged();
     }
 
-    string Classe = "";
-
-    private void Chiudi()
-    {
-        IsVisible = false;
-    }
 }

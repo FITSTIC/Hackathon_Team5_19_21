@@ -9,8 +9,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Hackathon_Team5_19_21.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20200606133207_db1")]
-    partial class db1
+    [Migration("20200618132845_init")]
+    partial class init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -45,6 +45,9 @@ namespace Hackathon_Team5_19_21.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("Email")
+                        .IsUnique();
+
                     b.ToTable("Amministratori");
                 });
 
@@ -54,7 +57,8 @@ namespace Hackathon_Team5_19_21.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<int>("IdProvincia")
+                    b.Property<int?>("IdProvincia")
+                        .IsRequired()
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("Nome")
@@ -80,10 +84,12 @@ namespace Hackathon_Team5_19_21.Migrations
                     b.Property<int>("AnnoInizio")
                         .HasColumnType("INTEGER");
 
-                    b.Property<int>("IdCitta")
+                    b.Property<int?>("IdCitta")
+                        .IsRequired()
                         .HasColumnType("INTEGER");
 
-                    b.Property<int>("IdOrganizzatore")
+                    b.Property<int?>("IdOrganizzatore")
+                        .IsRequired()
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("Nome")
@@ -105,21 +111,26 @@ namespace Hackathon_Team5_19_21.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<int>("IdModulo")
-                        .HasColumnType("INTEGER");
+                    b.Property<DateTime?>("Data")
+                        .HasColumnType("TEXT");
 
-                    b.Property<int>("IdStudenteIscritto")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int?>("Voto")
+                    b.Property<int?>("IdModulo")
                         .IsRequired()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int?>("IdStudenteIscritto")
+                        .IsRequired()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("Voto")
                         .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
 
                     b.HasIndex("IdModulo");
 
-                    b.HasIndex("IdStudenteIscritto");
+                    b.HasIndex("IdStudenteIscritto", "IdModulo")
+                        .IsUnique();
 
                     b.ToTable("Esami");
                 });
@@ -136,13 +147,16 @@ namespace Hackathon_Team5_19_21.Migrations
                     b.Property<DateTime>("DataInizio")
                         .HasColumnType("TEXT");
 
-                    b.Property<int>("IdCorso")
+                    b.Property<int?>("IdCorso")
+                        .IsRequired()
                         .HasColumnType("INTEGER");
 
-                    b.Property<int>("IdDocente")
+                    b.Property<int?>("IdDocente")
+                        .IsRequired()
                         .HasColumnType("INTEGER");
 
-                    b.Property<int>("IdTutor")
+                    b.Property<int?>("IdTutor")
+                        .IsRequired()
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("Materia")
@@ -187,7 +201,8 @@ namespace Hackathon_Team5_19_21.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<int>("IdAmministratore")
+                    b.Property<int?>("IdAmministratore")
+                        .IsRequired()
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("Nome")
@@ -206,12 +221,16 @@ namespace Hackathon_Team5_19_21.Migrations
 
                     b.Property<string>("Telefono")
                         .IsRequired()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("TEXT")
+                        .HasMaxLength(10);
 
                     b.Property<bool>("Tutor")
                         .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("Email")
+                        .IsUnique();
 
                     b.HasIndex("IdAmministratore");
 
@@ -261,7 +280,8 @@ namespace Hackathon_Team5_19_21.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<int>("IdCitta")
+                    b.Property<int?>("IdCitta")
+                        .IsRequired()
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("Indirizzo")
@@ -273,7 +293,6 @@ namespace Hackathon_Team5_19_21.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Password")
-                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Telefono")
@@ -299,10 +318,12 @@ namespace Hackathon_Team5_19_21.Migrations
                     b.Property<DateTime>("DataIscrizione")
                         .HasColumnType("TEXT");
 
-                    b.Property<int>("IdCorso")
+                    b.Property<int?>("IdCorso")
+                        .IsRequired()
                         .HasColumnType("INTEGER");
 
-                    b.Property<int>("IdStudente")
+                    b.Property<int?>("IdStudente")
+                        .IsRequired()
                         .HasColumnType("INTEGER");
 
                     b.Property<bool>("NonAmmesso")
@@ -323,209 +344,13 @@ namespace Hackathon_Team5_19_21.Migrations
                     b.ToTable("StudentiIscritti");
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
-                {
-                    b.Property<string>("Id")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("ConcurrencyStamp")
-                        .IsConcurrencyToken()
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Name")
-                        .HasColumnType("TEXT")
-                        .HasMaxLength(256);
-
-                    b.Property<string>("NormalizedName")
-                        .HasColumnType("TEXT")
-                        .HasMaxLength(256);
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("NormalizedName")
-                        .IsUnique()
-                        .HasName("RoleNameIndex");
-
-                    b.ToTable("AspNetRoles");
-                });
-
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("ClaimType")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("ClaimValue")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("RoleId")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("RoleId");
-
-                    b.ToTable("AspNetRoleClaims");
-                });
-
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUser", b =>
-                {
-                    b.Property<string>("Id")
-                        .HasColumnType("TEXT");
-
-                    b.Property<int>("AccessFailedCount")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("ConcurrencyStamp")
-                        .IsConcurrencyToken()
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Email")
-                        .HasColumnType("TEXT")
-                        .HasMaxLength(256);
-
-                    b.Property<bool>("EmailConfirmed")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<bool>("LockoutEnabled")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<DateTimeOffset?>("LockoutEnd")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("NormalizedEmail")
-                        .HasColumnType("TEXT")
-                        .HasMaxLength(256);
-
-                    b.Property<string>("NormalizedUserName")
-                        .HasColumnType("TEXT")
-                        .HasMaxLength(256);
-
-                    b.Property<string>("PasswordHash")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("PhoneNumber")
-                        .HasColumnType("TEXT");
-
-                    b.Property<bool>("PhoneNumberConfirmed")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("SecurityStamp")
-                        .HasColumnType("TEXT");
-
-                    b.Property<bool>("TwoFactorEnabled")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("UserName")
-                        .HasColumnType("TEXT")
-                        .HasMaxLength(256);
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("NormalizedEmail")
-                        .HasName("EmailIndex");
-
-                    b.HasIndex("NormalizedUserName")
-                        .IsUnique()
-                        .HasName("UserNameIndex");
-
-                    b.ToTable("AspNetUsers");
-                });
-
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("ClaimType")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("ClaimValue")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("AspNetUserClaims");
-                });
-
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
-                {
-                    b.Property<string>("LoginProvider")
-                        .HasColumnType("TEXT")
-                        .HasMaxLength(128);
-
-                    b.Property<string>("ProviderKey")
-                        .HasColumnType("TEXT")
-                        .HasMaxLength(128);
-
-                    b.Property<string>("ProviderDisplayName")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("LoginProvider", "ProviderKey");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("AspNetUserLogins");
-                });
-
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<string>", b =>
-                {
-                    b.Property<string>("UserId")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("RoleId")
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("UserId", "RoleId");
-
-                    b.HasIndex("RoleId");
-
-                    b.ToTable("AspNetUserRoles");
-                });
-
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
-                {
-                    b.Property<string>("UserId")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("LoginProvider")
-                        .HasColumnType("TEXT")
-                        .HasMaxLength(128);
-
-                    b.Property<string>("Name")
-                        .HasColumnType("TEXT")
-                        .HasMaxLength(128);
-
-                    b.Property<string>("Value")
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("UserId", "LoginProvider", "Name");
-
-                    b.ToTable("AspNetUserTokens");
-                });
-
             modelBuilder.Entity("Hackathon_Team5_19_21.Data.Citta", b =>
                 {
                     b.HasOne("Hackathon_Team5_19_21.Data.Provincia", "Provincia")
                         .WithMany("Citta")
                         .HasForeignKey("IdProvincia")
                         .HasConstraintName("ForeignKey_Provincia_Citta")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
@@ -535,14 +360,14 @@ namespace Hackathon_Team5_19_21.Migrations
                         .WithMany("Corsi")
                         .HasForeignKey("IdCitta")
                         .HasConstraintName("ForeignKey_Corso_Citta")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("Hackathon_Team5_19_21.Data.PersonaFitstic", "Organizzatore")
                         .WithMany("CorsiOrganizzatore")
                         .HasForeignKey("IdOrganizzatore")
                         .HasConstraintName("ForeignKey_Corso_Organizzatore")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
@@ -552,14 +377,14 @@ namespace Hackathon_Team5_19_21.Migrations
                         .WithMany("Esami")
                         .HasForeignKey("IdModulo")
                         .HasConstraintName("ForeignKey_Modulo_Esame")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("Hackathon_Team5_19_21.Data.StudenteIscritto", "StudenteIscritto")
                         .WithMany("Esami")
                         .HasForeignKey("IdStudenteIscritto")
                         .HasConstraintName("ForeignKey_Esame_StudenteIscritto")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
@@ -569,21 +394,21 @@ namespace Hackathon_Team5_19_21.Migrations
                         .WithMany("Moduli")
                         .HasForeignKey("IdCorso")
                         .HasConstraintName("ForeignKey_Modulo_Corso")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("Hackathon_Team5_19_21.Data.PersonaFitstic", "Docente")
                         .WithMany("ModuliDocente")
                         .HasForeignKey("IdDocente")
                         .HasConstraintName("ForeignKey_Modulo_Docente")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("Hackathon_Team5_19_21.Data.PersonaFitstic", "Tutor")
                         .WithMany("ModuliTutor")
                         .HasForeignKey("IdTutor")
                         .HasConstraintName("ForeignKey_Modulo_Tutor")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
@@ -593,7 +418,7 @@ namespace Hackathon_Team5_19_21.Migrations
                         .WithMany("PersonaleFistic")
                         .HasForeignKey("IdAmministratore")
                         .HasConstraintName("ForeignKey_Amministratore_PersonaFitstic")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
@@ -603,7 +428,7 @@ namespace Hackathon_Team5_19_21.Migrations
                         .WithMany("Studenti")
                         .HasForeignKey("IdCitta")
                         .HasConstraintName("ForeignKey_Studente_Citta")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
@@ -613,64 +438,13 @@ namespace Hackathon_Team5_19_21.Migrations
                         .WithMany("StudentiIscritti")
                         .HasForeignKey("IdCorso")
                         .HasConstraintName("ForeignKey_Corso_StudenteIscritto")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("Hackathon_Team5_19_21.Data.Studente", "Studente")
                         .WithMany("StudentiIscritti")
                         .HasForeignKey("IdStudente")
                         .HasConstraintName("ForeignKey_Studente_StudenteIscritto")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
-                {
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
-                        .WithMany()
-                        .HasForeignKey("RoleId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
-                {
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
-                {
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<string>", b =>
-                {
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
-                        .WithMany()
-                        .HasForeignKey("RoleId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
-                {
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });

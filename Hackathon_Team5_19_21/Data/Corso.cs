@@ -10,18 +10,18 @@ namespace Hackathon_Team5_19_21.Data
     {
         [Key]
         public int Id { get; set; }
-        [Required]
+        [Required(ErrorMessage ="Il Nome è obbligatorio")]
         public string Nome { get; set; }
-        [Required]
+        [Required(ErrorMessage = "L\'Anno di Inizio è obbligatorio")]
         public int AnnoInizio { get; set; }
-        [Required]
+        [Required(ErrorMessage = "L\'Anno di Fine è obbligatorio")]
         public int AnnoFine { get; set; }
         public Citta Citta { get; set; }
-        [Required]
-        public int IdCitta { get; set; }
+        [Required(ErrorMessage = "Selezionare una citta")]
+        public int? IdCitta { get; set; }
         public PersonaFitstic Organizzatore {get;set;}
-        [Required]
-        public int IdOrganizzatore { get; set; }
+        [Required(ErrorMessage = "Selezionare un organizzatore")]
+        public int? IdOrganizzatore { get; set; }
         public List<StudenteIscritto> StudentiIscritti{get;set;}
         public List<Modulo> Moduli{get;set;}
     }

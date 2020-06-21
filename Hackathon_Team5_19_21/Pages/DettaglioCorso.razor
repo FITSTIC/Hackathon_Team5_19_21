@@ -17,31 +17,20 @@ else
     <h1 class="mb-4">Dettaglio Corso</h1>
 }
 <div class="container mb-4">
+    <Alert Model="@AlertCorsi"></Alert>
     <EditForm Model="@Corso" OnValidSubmit="() => Form_OnSubmit()">
         <DataAnnotationsValidator />
         <ValidationSummary />
-        <div class="input-group mb-3">
-            <div class="input-group-prepend">
-                <span class="input-group-text">Nome</span>
-            </div>
+        <InputGroup Text="Nome">
             <InputText class="form-control" @bind-Value="Corso.Nome"></InputText>
-        </div>
-        <div class="input-group mb-3">
-            <div class="input-group-prepend">
-                <span class="input-group-text">Anno Inizio</span>
-            </div>
+        </InputGroup>
+        <InputGroup Text="Anno Inizio">
             <InputNumber class="form-control" @bind-Value="Corso.AnnoInizio"></InputNumber>
-        </div>
-        <div class="input-group mb-3">
-            <div class="input-group-prepend">
-                <span class="input-group-text">Anno Fine</span>
-            </div>
+        </InputGroup>
+        <InputGroup Text="Anno Fine">
             <InputNumber class="form-control" @bind-Value="Corso.AnnoFine"></InputNumber>
-        </div>
-        <div class="input-group mb-3">
-            <div class="input-group-prepend">
-                <label class="input-group-text">Provincia</label>
-            </div>
+        </InputGroup>
+        <InputGroup Text="Provincia">
             <select class="custom-select" @onchange="(e)=>Provincia_OnChange(e)">
                 @if (Id == null)
                 {
@@ -55,7 +44,7 @@ else
                 {
                     @foreach (var provincia in province)
                     {
-                        @if (provincia.Id == ServizioCitta.GetProvinciaByIdCitta(Corso.IdCitta).Result.Id)
+                        @if (Corso.IdCitta != null && provincia.Id == ServizioCitta.GetProvinciaByIdCitta((int)Corso.IdCitta).Result.Id)
                         {
                             <option selected value="@provincia.Id">@provincia.Nome</option>
                         }
@@ -66,148 +55,118 @@ else
                     }
                 }
             </select>
-        </div>
-        <div class="input-group mb-3">
-            <div class="input-group-prepend">
-                <label class="input-group-text">Citta</label>
-            </div>
-            <select class="custom-select" @bind="Corso.IdCitta">
+        </InputGroup>
+        <InputGroup Text="Citta">
+            <InputSelectNumber class="custom-select" @bind-Value="Corso.IdCitta">
                 @if (Id == null)
                 {
-                    <option value="0">Seleziona una citta</option>
+                    <option value="">Seleziona una citta</option>
                 }
                 @foreach (var citta in cittas)
                 {
                     <option value="@citta.Id">@citta.Nome</option>
                 }
-            </select>
-        </div>
-        <div class="input-group mb-3">
-            <div class="input-group-prepend">
-                <label class="input-group-text">Organizzatore</label>
-            </div>
-            <select class="custom-select" @bind="Corso.IdOrganizzatore">
+            </InputSelectNumber>
+        </InputGroup>
+        <InputGroup Text="Organizzatore">
+            <InputSelectNumber class="custom-select" @bind-Value="Corso.IdOrganizzatore">
                 @if (Id == null)
                 {
-                    <option value="0">Seleziona un organizzatore</option>
+                    <option value="">Seleziona un organizzatore</option>
                 }
                 @foreach (var organizzatore in ServizioPersonaleFitstic.GetOrganizzatori().Result)
                 {
                     <option value="@organizzatore.Id">@organizzatore.Nome @organizzatore.Cognome Nato il @organizzatore.DataNascita.ToShortDateString() e Assunto il @organizzatore.DataAssunzione.ToShortDateString()</option>
                 }
-            </select>
-        </div>
-        <div class="text-right">
-            <button type="submit" class="btn btn-success">Salva</button>
+            </InputSelectNumber>
+        </InputGroup>
+        <div class="d-flex flex-column flex-md-row justify-content-end align-items-center">
+            <a href="/corsi" class="btn btn-secondary w-100px ml-1 mt-1 mt-md-0">Indietro</a>
+            @if (Id != null)
+            {
+                <button type="button" class="btn btn-danger w-100px ml-1 mt-1 mt-md-0" data-toggle="modal" data-target="#elimina-corso">Elimina</button>
+            }
+            <button type="submit" class="btn btn-success w-100px ml-1 mt-1 mt-md-0">Salva</button>
         </div>
     </EditForm>
 </div>
+<Modal Id="elimina-corso" BtnText="Elimina" Titolo="Elimina Corso" OnClick="async () => await EliminaCorso(Corso)">
+    Sei sicuro di voler eliminare il corso @Corso?.Nome @Corso?.AnnoInizio - @Corso?.AnnoFine?
+</Modal>
 @if (Id != null)
 {
     <hr />
     <h1 class="mb-4">Moduli</h1>
-    <div class="card shadow mb-4">
-        <div class="card-header py-3 d-flex flex-row justify-content-between align-items-center">
+    <Card>
+        <CardHeader>
             <h6 class="m-0 font-weight-bold text-primary">Moduli</h6>
             <a href="/corsi/@Id/moduli/create" class="btn btn-success">Aggiungi</a>
-        </div>
-        <div class="card-body">
-            <div class="table-responsive">
-                <table class="table table-bordered" width="100%" cellspacing="0">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Nome</th>
-                            <th>Data Inizio</th>
-                            <th>Data Fine</th>
-                            <th>Materia</th>
-                            <th>Docente</th>
-                            <th>Tutor</th>
-                            <th></th>
-                            <th></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var modulo in ServizioModuli.GetModuliDelCorso((int)Id).Result)
+        </CardHeader>
+        <CardBody>
+            <Table Id="moduli" Items="ServizioModuli.GetModuliDelCorso((int)Id).Result">
+                <TableHeader>
+                    <th>ID</th>
+                    <th>Nome</th>
+                    <th>Data Inizio</th>
+                    <th>Data Fine</th>
+                    <th>Materia</th>
+                    <th>Docente</th>
+                    <th>Tutor</th>
+                    <th></th>
+                </TableHeader>
+                <RowTemplate>
+                    <td>@context.Id</td>
+                    <td>@context.Nome</td>
+                    <td>@context.DataInizio.ToShortDateString()</td>
+                    <td>@context.DataFine?.ToShortDateString()</td>
+                    <td>@context.Materia</td>
+                    @using (var docente = ServizioModuli.GetDocenteDelModulo(context))
                         {
-                            <tr>
-                                <td>@modulo.Id</td>
-                                <td>@modulo.Nome</td>
-                                <td>@modulo.DataInizio.ToShortDateString()</td>
-                                @if (modulo.DataFine.HasValue)
-                                {
-                                    <td>@modulo.DataFine.Value.ToShortDateString()</td>
-                                }
-                                else
-                                {
-                                    <td>In Corso</td>
-                                }
-                                <td>@modulo.Materia</td>
-                                @using (var docente = ServizioModuli.GetDocenteDelModulo(modulo))
-                                {
-                                    <td>
-                                        @docente.Result.Nome @docente.Result.Cognome
-                                    </td>
-                                }
-                                @using (var tutor = ServizioModuli.GetTutorDelModulo(modulo))
-                                {
-                                    <td>
-                                        @tutor.Result.Nome @tutor.Result.Cognome
-                                    </td>
-                                }
-                                <td><a href="/corsi/@Id/moduli/view/@modulo.Id" class="btn btn-primary">Dettaglio</a></td>
-                                <td><button type="button" class="btn btn-danger" @onclick="() => BtnElimina_Click(modulo)">Elimina</button></td>
-                            </tr>
+                        <td>
+                            @docente.Result.Nome @docente.Result.Cognome
+                        </td>
                         }
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-
+                    @using (var tutor = ServizioModuli.GetTutorDelModulo(context))
+                        {
+                        <td>
+                            @tutor.Result.Nome @tutor.Result.Cognome
+                        </td>
+                        }
+                    <td><a href="/corsi/@Id/moduli/view/@context.Id" class="btn btn-primary">Dettaglio</a></td>
+                </RowTemplate>
+            </Table>
+        </CardBody>
+    </Card>
     <hr />
     <h1 class="mb-4">Iscrizioni</h1>
-    <div class="card shadow mb-4">
-        <div class="card-header py-3 d-flex flex-row justify-content-between align-items-center">
+    <Card>
+        <CardHeader>
             <h6 class="m-0 font-weight-bold text-primary">Iscrizioni</h6>
             <a href="/corsi/@Id/iscrizioni/create" class="btn btn-success">Aggiungi</a>
-        </div>
-        <div class="card-body">
-            <div class="table-responsive">
-                <table class="table table-bordered" width="100%" cellspacing="0">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Nome</th>
-                            <th>Cognome</th>
-                            <th>Data Iscrizione</th>
-                            <th>Non Ammesso</th>
-                            <th>Ritirato</th>
-                            <th>Voto Finale</th>
-                            <th></th>
-                            <th></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var studente in ServizioStudenti.GetStudentiDelCorso((int)Id).Result)
-                        {
-                            <tr>
-                                <td>@studente.Id</td>
-                                <td>@studente.Nome</td>
-                                <td>@studente.Cognome</td>
-                                <td>@studente.DataIscrizione</td>
-                                <td>@studente.NonAmmesso</td>
-                                <td>@studente.Ritirato</td>
-                                <td>@studente.VotoFinale</td>
-                                <td><a href="/corsi/@Id/iscrizioni/view/@studente.Id" class="btn btn-primary">Dettaglio</a></td>
-                                <td><button type="button" class="btn btn-danger" @onclick="() => BtnEliminaStudente_Click(studente)">Elimina</button></td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
+        </CardHeader>
+        <CardBody>
+            <Table Id="iscrizioni" Items="ServizioStudenti.GetStudentiDelCorso((int)Id).Result">
+                <TableHeader>
+                    <th>ID</th>
+                    <th>Nome</th>
+                    <th>Cognome</th>
+                    <th>Data Iscrizione</th>
+                    <th>Stato</th>
+                    <th>Voto Finale</th>
+                    <th></th>
+                </TableHeader>
+                <RowTemplate>
+                    <td>@context.Id</td>
+                    <td>@context.Nome</td>
+                    <td>@context.Cognome</td>
+                    <td>@context.DataIscrizione</td>
+                    <td>@ServizioStudenti.StatoToString(context)</td>
+                    <td>@context.VotoFinale</td>
+                    <td><a href="/corsi/@Id/iscrizioni/view/@context.Id" class="btn btn-primary">Dettaglio</a></td>
+                </RowTemplate>
+            </Table>
+        </CardBody>
+    </Card>
 }
 @code {
     [Parameter]
@@ -215,6 +174,9 @@ else
     public Corso Corso { get; set; }
     List<Provincia> province;
     List<Citta> cittas;
+
+    AlertSettings AlertCorsi = new AlertSettings();
+
     [CascadingParameter]
     private Task<AuthenticationState> authenticationStateTask { get; set; }
 
@@ -225,13 +187,18 @@ else
         {
             province = await ServizioCitta.GetProvince();
             Corso = Id == null ? new Corso { AnnoInizio = DateTime.Now.Year, AnnoFine = DateTime.Now.Year } : await ServizioCorsi.CorsoById((int)Id);
-            cittas = Id != null ? await ServizioCitta.GetCittaByIdProvicia(ServizioCitta.GetProvinciaByIdCitta(Corso.IdCitta).Result.Id) : new List<Citta>();
+            cittas = Id != null ? await ServizioCitta.GetCittaByIdProvicia(ServizioCitta.GetProvinciaByIdCitta((int)Corso.IdCitta).Result.Id) : new List<Citta>();
         }
         else NavigationManager.NavigateTo("/");
     }
     protected async override Task OnAfterRenderAsync(bool firstRender)
     {
-        if (firstRender) await JSRuntime.InvokeVoidAsync("GeneraDataTable", 7, 8);
+        if (firstRender)
+        {
+            await JSRuntime.InvokeVoidAsync("GeneraDataTable", 7, "#moduli");
+            await JSRuntime.InvokeVoidAsync("GeneraDataTable", 6, "#iscrizioni");
+        }
+
     }
     protected async Task Form_OnSubmit()
     {
@@ -243,19 +210,14 @@ else
     protected async Task Provincia_OnChange(ChangeEventArgs e)
     {
         int idProv;
-        Corso.IdCitta = 0;
+        Corso.IdCitta = null;
         if (int.TryParse(e.Value.ToString(), out idProv)) cittas = await ServizioCitta.GetCittaByIdProvicia(idProv);
     }
-    protected async Task BtnElimina_Click(Modulo modulo)
+    protected async Task EliminaCorso(Corso c)
     {
-        await ServizioModuli.EliminaModulo(modulo);
-        StateHasChanged();
-
+        string nomeCorso = c.Nome;
+        if (await ServizioCorsi.EliminaCorso(c)) NavigationManager.NavigateTo("/corsi");
+        else AlertCorsi = new AlertSettings() { IsVisible = true, TypeMessage = Color.Danger, Message = $"Il Corso \"{nomeCorso}\" non può essere eliminato" };
     }
-    protected async Task BtnEliminaStudente_Click(dynamic studente)
-    {
-        await ServizioStudenti.EliminaIscrizione(studente.Id);
-        StateHasChanged();
 
-    }
 }

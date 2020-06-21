@@ -3,48 +3,33 @@
 
 @inject IServizioPersonaleFitstic ServizioPersonaleFitstic
 
-<h1>Personale</h1>
 @if (Id == null)
 {
-    <p>Aggiungi un nuovo dipendente</p>
+    <h1 class="mb-4">Aggiungi un Dipendente</h1>
 }
 else
 {
-    <p>Modifica dipendente</p>
+    <h1 class="mb-4">Dettaglio Dipendente</h1>
 }
 
 <div class="container mb-4">
+    <Alert Model="@AlertPersonale"></Alert>
     <EditForm Model="@Persona" OnValidSubmit="()=>Form_OnSubmit()">
         <DataAnnotationsValidator />
         <ValidationSummary />
-        <div class="input-group mb-3">
-            <div class="input-group-prepend">
-                <span class="input-group-text">Nome</span>
-            </div>
-            <InputText class="form-control" @bind-Value="Persona.Nome" required></InputText>
-        </div>
-        <div class="input-group mb-3">
-            <div class="input-group-prepend">
-                <span class="input-group-text">Cognome</span>
-            </div>
-            <InputText class="form-control" @bind-Value="Persona.Cognome" required></InputText>
-        </div>
-        <div class="input-group mb-3">
-            <div class="input-group-prepend">
-                <span class="input-group-text">Data Nascita</span>
-            </div>
-            <InputDate class="form-control" @bind-Value="Persona.DataNascita" required></InputDate>
-        </div>
-        <div class="input-group mb-3">
-            <div class="input-group-prepend">
-                <span class="input-group-text">Data Assunzione</span>
-            </div>
-            <InputDate class="form-control" @bind-Value="Persona.DataAssunzione" required></InputDate>
-        </div>
-        <div class="input-group mb-3">
-            <div class="input-group-prepend">
-                <span class="input-group-text">Ruoli</span>
-            </div>
+        <InputGroup Text="Nome">
+            <InputText class="form-control" @bind-Value="Persona.Nome"></InputText>
+        </InputGroup>
+        <InputGroup Text="Cognome">
+            <InputText class="form-control" @bind-Value="Persona.Cognome"></InputText>
+        </InputGroup>
+        <InputGroup Text="Data Nascita">
+            <InputDate class="form-control" @bind-Value="Persona.DataNascita"></InputDate>
+        </InputGroup>
+        <InputGroup Text="Data Assunzione">
+            <InputDate class="form-control" @bind-Value="Persona.DataAssunzione"></InputDate>
+        </InputGroup>
+        <InputGroup Text="Ruoli">
             <div class="form-control h-auto d-flex flex-column flex-sm-row justify-content-around">
                 <div class="custom-control custom-checkbox">
                     <InputCheckbox class="custom-control-input" id="ckb1" @bind-Value="Persona.Docente"></InputCheckbox>
@@ -59,23 +44,20 @@ else
                     <label class="custom-control-label" for="ckb3">Tutor</label>
                 </div>
             </div>
-        </div>
-        <div class="input-group mb-3">
-            <div class="input-group-prepend">
-                <span class="input-group-text">Email</span>
-            </div>
+        </InputGroup>
+        <InputGroup Text="Email">
             <InputText type="email" class="form-control" @bind-Value="Persona.Email" required></InputText>
-        </div>
+        </InputGroup>
         <div class="input-group mb-3">
-            <div class="input-group-prepend">
-                <span class="input-group-text">Password</span>
+            <div class="input-group-prepend"><span class="input-group-text">Password</span></div>
+            <InputText type="@( VisualizzaPassword ? "text" : "password" )" class="form-control" @bind-Value="Persona.Password"></InputText>
+            <div class="input-group-append">
+                <span class="input-group-text">
+                    <i class="fa fa-fw @( VisualizzaPassword ? "fa-eye-slash":"fa-eye" ) field-icon" @onmouseup="()=> { VisualizzaPassword = !VisualizzaPassword; }"></i>
+                </span>
             </div>
-            <InputText class="form-control" @bind-Value="Persona.Password" required></InputText>
         </div>
-        <div class="input-group mb-3">
-            <div class="input-group-prepend">
-                <span class="input-group-text">Prima Password</span>
-            </div>
+        <InputGroup Text="Prima Password">
             <div class="form-control h-auto d-flex flex-column flex-sm-row justify-content-around">
                 <div class="custom-control custom-radio">
                     @if (Persona.PrimaPassword)
@@ -95,31 +77,38 @@ else
                     }
                     else
                     {
-                        <input type="radio" name="radioPrimaPassword" class="custom-control-input" id="r2" checked @onchange="(e)=>PrimaPassword_OnChange(false)"/>
+                        <input type="radio" name="radioPrimaPassword" class="custom-control-input" id="r2" checked @onchange="(e)=>PrimaPassword_OnChange(false)" />
                     }
                     <label class="custom-control-label" for="r2">No</label>
                 </div>
             </div>
-        </div>
-        <div class="input-group mb-3">
-            <div class="input-group-prepend">
-                <span class="input-group-text">Telefono</span>
-            </div>
-            <InputText class="form-control" @bind-Value="Persona.Telefono" required></InputText>
-        </div>
-        <div class="text-right">
-            <button type="submit" class="btn btn-success">Salva</button>
+        </InputGroup>
+        <InputGroup Text="Telefono">
+            <InputText class="form-control" @bind-Value="Persona.Telefono"></InputText>
+        </InputGroup>
+        <div class="d-flex flex-column flex-md-row justify-content-end align-items-center">
+            <button type="button" class="btn btn-secondary w-100px ml-1 mt-1 mt-md-0" @onclick='()=> { NavigationManager.NavigateTo("/personale"); }'>Indietro</button>
+            @if (Id != null)
+            {
+                <button type="button" class="btn btn-danger w-100px ml-1 mt-1 mt-md-0" data-toggle="modal" data-target="#elimina-persona">Elimina</button>
+            }
+            <button type="submit" class="btn btn-success w-100px ml-1 mt-1 mt-md-0">Salva</button>
         </div>
     </EditForm>
 </div>
-
+<Modal Id="elimina-persona" BtnText="Elimina" OnClick="()=>EliminaPersonaFitstic(Persona)" Titolo="Elimina Dipendente">
+    Sei sicuro di voler rimuovere il dipendente @Persona?.Nome @Persona?.Cognome?
+</Modal>
 @code {
+    AlertSettings AlertPersonale = new AlertSettings();
     [Parameter]
     public int? Id { get; set; }
     public PersonaFitstic Persona { get; set; }
 
     [CascadingParameter]
     private Task<AuthenticationState> authenticationStateTask { get; set; }
+
+    bool VisualizzaPassword { get; set; }
 
     protected async override Task OnInitializedAsync()
     {
@@ -139,7 +128,7 @@ else
             if (Persona.PrimaPassword) Persona.Password = Persona.Password.Sha256();
             if (await ServizioPersonaleFitstic.ControllaRuoli(Persona)) await ServizioPersonaleFitstic.SalvaCambiamenti();
             else await ServizioPersonaleFitstic.ReimpostaRuoli(Persona);
-            
+
         }
         StateHasChanged();
         NavigationManager.NavigateTo("/personale");
@@ -147,5 +136,14 @@ else
     protected void PrimaPassword_OnChange(bool ris)
     {
         Persona.PrimaPassword = ris;
+    }
+    protected async Task EliminaPersonaFitstic(PersonaFitstic p)
+    {
+        string nome = p.Nome;
+        string cognome = p.Cognome;
+        if (await ServizioPersonaleFitstic.EliminaPersona(p)) NavigationManager.NavigateTo("/personale");
+        else AlertPersonale = new AlertSettings() { IsVisible = true, TypeMessage = Color.Danger, Message = $"Il Dipendente {nome} {cognome} non può essere rimosso" };
+
+
     }
 }

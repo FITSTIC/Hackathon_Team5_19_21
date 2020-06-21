@@ -37,7 +37,7 @@ namespace Hackathon_Team5_19_21.Data
         public string Telefono { get; set; }
         public Amministratore Amministratore { get; set; }
         [Required]
-        public int IdAmministratore { get; set; }
+        public int? IdAmministratore { get; set; }
         public List<Modulo> ModuliDocente{get;set;}
         public List<Modulo> ModuliTutor { get; set; }
         public List<Corso> CorsiOrganizzatore { get; set; }

@@ -38,14 +38,14 @@ namespace Hackathon_Team5_19_21
             services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlite(
                     Configuration.GetConnectionString("DefaultConnection")));
-            services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
-                .AddEntityFrameworkStores<ApplicationDbContext>();
+            //services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
+            //    .AddEntityFrameworkStores<ApplicationDbContext>();
             services.AddRazorPages();
             services.AddServerSideBlazor();
             //services.AddScoped<AuthenticationStateProvider, RevalidatingIdentityAuthenticationStateProvider<IdentityUser>>();
             services.AddScoped<AuthenticationStateProvider, CustomAuthenticationStateProvider>();
             services.AddScoped<IServizioModuli, ServizioModuli>();
-            services.AddTransient<IServizioPersonaleFitstic, ServizioPersonaleFitstic>();
+            services.AddScoped<IServizioPersonaleFitstic, ServizioPersonaleFitstic>();
             services.AddScoped<IServizioCorsi, ServizioCorsi>();
             services.AddScoped<IServizioCitta, ServizioCitta>();
             services.AddScoped<IServizioEsami, ServizioEsami>();

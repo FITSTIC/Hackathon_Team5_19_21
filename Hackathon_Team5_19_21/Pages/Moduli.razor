@@ -4,76 +4,55 @@
 @inject IServizioPersonaleFitstic ServizioPersonaleFitstic
 @inject IServizioCorsi ServizioCorsi
 
-<h1>Moduli</h1>
+<h1 class="mb-4">Moduli</h1>
 
-<p>Visualizza i moduli</p>
-@if (corsi != null)
+@foreach (var corso in corsi ?? new List<Corso>())
 {
-    @foreach (var corso in corsi)
-    {
-        <div class="card shadow mb-4">
-            <div class="card-header py-3 d-flex flex-row justify-content-between align-items-center">
-                <h6 class="m-0 font-weight-bold text-primary">@corso.Nome @corso.AnnoInizio - @corso.AnnoFine</h6>
-                <a href="/moduli/create/@corso.Id" class="btn btn-success">Aggiungi</a>
-            </div>
-            <div class="card-body">
-                <div class="table-responsive">
-                    <table id="elencoModuli" class="table table-bordered" width="100%" cellspacing="0">
-                        <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>Nome</th>
-                                <th>Data Inizio</th>
-                                <th>Data Fine</th>
-                                <th>Materia</th>
-                                <th>Docente</th>
-                                <th>Tutor</th>
-                                <th></th>
-                                <th></th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach (var modulo in ServizioModuli.GetModuliDelCorso(corso).Result)
-                            {
-                                <tr>
-                                    <td>@modulo.Id</td>
-                                    <td>@modulo.Nome</td>
-                                    <td>@modulo.DataInizio.ToShortDateString()</td>
-                                    @if (modulo.DataFine.HasValue)
-                                    {
-                                        <td>@modulo.DataFine.Value.ToShortDateString()</td>
-                                    }
-                                    else
-                                    {
-                                        <td>In Corso</td>
-                                    }
-                                    <td>@modulo.Materia</td>
-                                    @using (var docente = ServizioModuli.GetDocenteDelModulo(modulo))
-                                    {
-                                        <td>
-                                            @docente.Result.Nome @docente.Result.Cognome
-                                        </td>
-                                    }
-                                    @using (var tutor = ServizioModuli.GetTutorDelModulo(modulo))
-                                    {
-                                        <td>
-                                            @tutor.Result.Nome @tutor.Result.Cognome
-                                        </td>
-                                    }
-                                    <td><a href="/moduli/view/@modulo.Id" class="btn btn-primary">Dettaglio</a></td>
-                                    <td><button type="button" class="btn btn-danger" @onclick="() => BtnElimina_Click(modulo)">Elimina</button></td>
-                                </tr>
-                            }
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-    }
+    <Card>
+        <CardHeader>
+            <h6 class="m-0 font-weight-bold text-primary">@corso.Nome @corso.AnnoInizio - @corso.AnnoFine</h6>
+            <a href="/moduli/create/@corso.Id" class="btn btn-success">Aggiungi</a>
+        </CardHeader>
+        <CardBody>
+            <Table Items="ServizioModuli.GetModuliDelCorso(corso).Result">
+                <TableHeader>
+                    <th>ID</th>
+                    <th>Nome</th>
+                    <th>Data Inizio</th>
+                    <th>Data Fine</th>
+                    <th>Materia</th>
+                    <th>Docente</th>
+                    <th>Tutor</th>
+                    <th></th>
+                </TableHeader>
+                <RowTemplate>
+                    <td>@context.Id</td>
+                    <td>@context.Nome</td>
+                    <td>@context.DataInizio.ToShortDateString()</td>
+                    <td>@context.DataFine?.ToShortDateString()</td>
+                    <td>@context.Materia</td>
+                    @using (var docente = ServizioModuli.GetDocenteDelModulo(context))
+                        {
+                        <td>
+                            @docente.Result.Nome @docente.Result.Cognome
+                        </td>
+                        }
+                    @using (var tutor = ServizioModuli.GetTutorDelModulo(context))
+                        {
+                        <td>
+                            @tutor.Result.Nome @tutor.Result.Cognome
+                        </td>
+                        }
+                    <td><a href="/moduli/view/@context.Id" class="btn btn-primary">Dettaglio</a></td>
+                </RowTemplate>
+            </Table>
+        </CardBody>
+    </Card>
+
 }
 
-@code {
 
+@code {
     List<Corso> corsi;
     List<PersonaFitstic> docenti;
     List<PersonaFitstic> tutors;
@@ -95,14 +74,9 @@
     }
     protected async override Task OnAfterRenderAsync(bool firstRender)
     {
-        if (firstRender) await JSRuntime.InvokeVoidAsync("GeneraDataTableModuli");
+        if (firstRender) await JSRuntime.InvokeVoidAsync("GeneraDataTable", 7);
     }
 
-    protected async Task BtnElimina_Click(Modulo modulo)
-    {
-        await ServizioModuli.EliminaModulo(modulo);
-        StateHasChanged();
-
-    }
+    
 
 }

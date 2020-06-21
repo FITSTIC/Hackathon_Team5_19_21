@@ -16,10 +16,19 @@ namespace Hackathon_Team5_19_21.Data
             return await _db.Moduli.ToListAsync();
         }
 
-        public async Task SalvaModulo(Modulo modulo)
+        public async Task<bool> SalvaModulo(Modulo modulo)
         {
-            await _db.Moduli.AddAsync(modulo);
-            await SalvaCambiamenti();
+            bool result = false;
+            PersonaFitstic d = await _db.PersonaleFitstic.FindAsync(modulo.IdDocente);
+            PersonaFitstic t = await _db.PersonaleFitstic.FindAsync(modulo.IdTutor);
+            Corso c = await _db.Corsi.FindAsync(modulo.IdCorso);
+            if(d!=null && t!=null && c != null)
+            {
+                _db.Moduli.Add(modulo);
+                await _db.SaveChangesAsync();
+                result = true;
+            }
+            return result;
         }
         public async Task<PersonaFitstic> GetTutorDelModulo(Modulo modulo)
         {
@@ -39,10 +48,18 @@ namespace Hackathon_Team5_19_21.Data
             return docenti.Count > 0 ? docenti[0] : null;
         }
 
-        public async Task EliminaModulo(Modulo modulo)
+        public async Task<bool> EliminaModulo(Modulo modulo)
         {
-            _db.Moduli.Remove(_db.Moduli.First(x => x.Id == modulo.Id));
-            await SalvaCambiamenti();
+            bool result = false;
+            Esame e = await _db.Esami.FirstOrDefaultAsync(x => x.IdModulo == modulo.Id);
+            if (e == null)
+            {
+                _db.Moduli.Remove(_db.Moduli.First(x => x.Id == modulo.Id));
+                await _db.SaveChangesAsync();
+                result = true;
+            }
+            return result;
+            
         }
 
         public async Task<List<Modulo>> GetModuli(Corso corso)
@@ -68,6 +85,11 @@ namespace Hackathon_Team5_19_21.Data
         public async Task<List<Modulo>> GetModuliDelCorso(int idCorso)
         {
             return await _db.Moduli.Where(x => x.IdCorso == idCorso).ToListAsync();
+        }
+
+        public async Task<List<Modulo>> GetModuliAttuali()
+        {
+            return await _db.Moduli.Where(x => x.DataFine == null).ToListAsync();
         }
     }
 }

@@ -27,7 +27,7 @@
                     Impostazioni
                 </a>
                 <div class="dropdown-divider"></div>-->
-                <button class="dropdown-item" href="/Account/Logout" @onclick="()=>Logout()">
+                <button class="dropdown-item" @onclick="()=>Logout()">
                     <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
                     Logout
                 </button>
@@ -42,8 +42,7 @@
     protected async override Task OnInitializedAsync()
     {
         var admin = await sessionStorage.GetItemAsync<Hackathon_Team5_19_21.Data.Amministratore>("admin");
-        if (admin != null)Utente = admin.Nome + " " + admin.Cognome;
-        else NavigationManager.NavigateTo("/");
+        Utente = admin != null ? admin.Nome + " " + admin.Cognome : "";
     }
     public async Task Logout()
     {

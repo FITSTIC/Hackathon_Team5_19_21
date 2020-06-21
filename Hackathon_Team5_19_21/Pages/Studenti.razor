@@ -3,75 +3,41 @@
 @inject IServizioStudenti ServizioStudenti
 @inject IServizioCitta ServizioCitta
 
-<h1>Studenti</h1>
-
-<p>Visualizza gli studenti</p>
-
-<div class="card shadow mb-4">
-    <div class="card-header py-3 d-flex flex-row justify-content-between align-items-center">
+<h1 class="mb-4">Studenti</h1>
+<Card>
+    <CardHeader>
         <h6 class="m-0 font-weight-bold text-primary">Studenti</h6>
         <a href="/studenti/create" class="btn btn-success">Aggiungi</a>
-    </div>
-    <div class="card-body">
-        <div class="table-responsive">
-            <table class="table table-bordered text-center">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Nome</th>
-                        <th>Cognome</th>
-                        <th>Data Nascita</th>
-                        <th>Indirizzo</th>
-                        <th>Tipo Diploma</th>
-                        <th>Anno Diploma</th>
-                        <th></th>
-                        <th></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @if (studenti != null)
-                    {
-                        @foreach (var studente in studenti)
-                        {
-                    <tr>
-                        <td class="align-middle">@studente.Id</td>
-                        <td class="align-middle">@studente.Nome</td>
-                        <td class="align-middle">@studente.Cognome</td>
-                        <td class="align-middle">@studente.DataNascita.ToShortDateString()</td>
-                        <td class="align-middle">@studente.Indirizzo, @studente.Civico, @ServizioCitta.GetCittaById(studente.IdCitta).Result.Nome (@ServizioCitta.GetProvinciaByIdCitta(studente.IdCitta).Result.Sigla)</td>
-                        @switch (studente.TipoDiploma)
-                        {
-                            case TipoDiploma.DiplomaMaturita:
-                                <td class="align-middle">Diploma di Maturità</td>
-                                break;
-                            case TipoDiploma.DottoratoDiRicerca:
-                                <td class="align-middle">Dottorato di Ricerca</td>
-                                break;
-                            case TipoDiploma.LaureaMagistrale:
-                                <td class="align-middle">Laurea Magistrale</td>
-                                break;
-                            case TipoDiploma.LaureaTriennale:
-                                <td class="align-middle">Laurea Triennale</td>
-                                break;
-                            case TipoDiploma.NessunDiploma:
-                                <td class="align-middle">Nessun Diploma</td>
-                                break;
-                        }
+    </CardHeader>
+    <CardBody>
+        <Table Items="studenti">
+            <TableHeader>
+                <th>ID</th>
+                <th>Nome</th>
+                <th>Cognome</th>
+                <th>Data Nascita</th>
+                <th>Indirizzo</th>
+                <th>Tipo Diploma</th>
+                <th>Anno Diploma</th>
+                <th></th>
+            </TableHeader>
+            <RowTemplate>
+                <td>@context.Id</td>
+                <td>@context.Nome</td>
+                <td>@context.Cognome</td>
+                <td>@context.DataNascita.ToShortDateString()</td>
+                <td>@context.Indirizzo, @context.Civico, @ServizioCitta.GetCittaById((int)context.IdCitta).Result.Nome (@ServizioCitta.GetProvinciaByIdCitta((int)context.IdCitta).Result.Sigla)</td>
+                <td>@ServizioStudenti.TipoDiplomaToString(context)</td>
+                <td>@context.AnnoDiploma</td>
+                <td><a href="/studenti/view/@context.Id" class="btn btn-primary w-100px">Dettaglio</a></td>
+            </RowTemplate>
+        </Table>
+    </CardBody>
+</Card>
 
-
-                        <td class="align-middle">@studente.AnnoDiploma</td>
-                        <td class="align-middle"><a href="/studenti/view/@studente.Id" class="btn btn-primary">Dettaglio</a></td>
-                        <td class="align-middle"><button type="button" class="btn btn-danger" @onclick="() => BtnElimina_Click(studente)">Elimina</button></td>
-                    </tr>
-                        }
-                    }
-                </tbody>
-            </table>
-        </div>
-    </div>
-</div>
 
 @code {
+    Studente StudenteSelezionato;
 
     List<Studente> studenti;
 
@@ -86,15 +52,9 @@
     }
     protected async override Task OnAfterRenderAsync(bool firstRender)
     {
-        if (firstRender) await JSRuntime.InvokeVoidAsync("GeneraDataTable", 7, 8);
+        if (firstRender) await JSRuntime.InvokeVoidAsync("GeneraDataTable", 7);
     }
 
-    protected async Task BtnElimina_Click(Studente s)
-    {
-        await ServizioStudenti.EliminaStudente(s);
-        studenti = await ServizioStudenti.GetStudenti();
-        StateHasChanged();
 
-    }
 
 }

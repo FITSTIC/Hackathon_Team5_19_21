@@ -6,64 +6,50 @@
 @inject IServizioCorsi ServizioCorsi
 @inject IServizioStudenti ServizioStudenti
 
-<h1>Iscrizioni</h1>
+
 @if (Id == null)
 {
-    <p>Aggiungi un'iscrizione</p>
+    <h1 class="mb-4">Aggiungi un'iscrizione</h1>
 }
 else
 {
-    <p>Modifica un'inscrizione</p>
+    <h1 class="mb-4">Dettaglio Iscrizione</h1>
 }
 <div class="container mb-4">
+    <Alert Model="@AlertIscrizioni"></Alert>
     <EditForm Model="@Iscrizione" OnValidSubmit="() => Form_OnSubmit()">
         <DataAnnotationsValidator />
         <ValidationSummary />
-
-        <div class="input-group mb-3">
-            <div class="input-group-prepend">
-                <label class="input-group-text">Studente</label>
-            </div>
+        <InputGroup Text="Studente">
             @if (Id == null)
             {
-                <select class="custom-select" @bind="Iscrizione.IdStudente">
-                    <option value="0">Seleziona uno studente</option>
+                <InputSelectNumber class="custom-select" @bind-Value="Iscrizione.IdStudente">
+                    <option value="">Seleziona uno studente</option>
                     @foreach (var studente in studenti)
-                    {
+                        {
                         <option value="@studente.Id">@studente.Nome @studente.Cognome Nato il @studente.DataNascita.ToShortDateString()</option>
 
-                    }
-                </select>
+                        }
+                </InputSelectNumber>
             }
             else
             {
-                <select disabled class="custom-select" @bind="Iscrizione.IdStudente">
+                <InputSelectNumber disabled class="custom-select" @bind-Value="Iscrizione.IdStudente">
                     @foreach (var studente in studenti)
-                    {
+                        {
                         <option value="@studente.Id">@studente.Nome @studente.Cognome Nato il @studente.DataNascita.ToShortDateString()</option>
 
-                    }
-                </select>
+                        }
+                </InputSelectNumber>
             }
-
-
-        </div>
-        <div class="input-group mb-3">
-            <div class="input-group-prepend">
-                <span class="input-group-text">Data Iscrizione</span>
-            </div>
+        </InputGroup>
+        <InputGroup Text="Data Iscrizione">
             <InputDate class="form-control" @bind-Value="Iscrizione.DataIscrizione"></InputDate>
-        </div>
-        <div class="input-group mb-3">
-            <div class="input-group-prepend">
-                <span class="input-group-text">Voto Finale</span>
-            </div>
+        </InputGroup>
+        <InputGroup Text="Voto Finale">
             <InputNumber class="form-control" @bind-Value="Iscrizione.VotoFinale"></InputNumber>
-        </div>
-        <div class="input-group mb-3">
-            <div class="input-group-prepend">
-                <span class="input-group-text">Stato</span>
-            </div>
+        </InputGroup>
+        <InputGroup Text="Stato">
             <div class="form-control h-auto d-flex flex-column flex-sm-row justify-content-around">
                 <div class="custom-control custom-radio">
                     @if (Iscrizione.NonAmmesso)
@@ -88,11 +74,8 @@ else
                     <label class="custom-control-label" for="r2">Ammesso</label>
                 </div>
             </div>
-        </div>
-        <div class="input-group mb-3">
-            <div class="input-group-prepend">
-                <span class="input-group-text">Ritirato</span>
-            </div>
+        </InputGroup>
+        <InputGroup Text="Ritirato">
             <div class="form-control h-auto d-flex flex-column flex-sm-row justify-content-around">
                 <div class="custom-control custom-radio">
                     @if (Iscrizione.Ritirato)
@@ -117,13 +100,20 @@ else
                     <label class="custom-control-label" for="r4">No</label>
                 </div>
             </div>
-        </div>
-        <div class="text-right">
-            <button type="submit" class="btn btn-success">Salva</button>
+        </InputGroup>
+        <div class="d-flex flex-column flex-md-row justify-content-end align-items-center">
+            <button type="button" class="btn btn-secondary w-100px ml-1 mt-1 mt-md-0" @onclick="()=>Indietro()">Indietro</button>
+            @if (Id != null)
+            {
+                <button type="button" class="btn btn-danger w-100px ml-1 mt-1 mt-md-0" data-toggle="modal" data-target="#elimina-iscrizione">Elimina</button>
+            }
+            <button type="submit" class="btn btn-success w-100px ml-1 mt-1 mt-md-0">Salva</button>
         </div>
     </EditForm>
 </div>
-
+<Modal Id="elimina-iscrizione" BtnText="Elimina" Titolo="Elimina Iscrizione" OnClick="async () => await EliminaIscrizione(Iscrizione)">
+    Sei sicuro di voler eliminare questo studente dal corso a cui è iscritto?
+</Modal>
 
 @code {
     [Parameter]
@@ -131,9 +121,12 @@ else
     [Parameter]
     public int? IdCorso { get; set; }
 
-    public StudenteIscritto Iscrizione { get; set; }
+    StudenteIscritto Iscrizione { get; set; }
+
     List<Corso> corsi;
     List<Studente> studenti;
+
+    AlertSettings AlertIscrizioni = new AlertSettings();
 
     [CascadingParameter]
     private Task<AuthenticationState> authenticationStateTask { get; set; }
@@ -144,7 +137,7 @@ else
         if (user.Identity.IsAuthenticated)
         {
             corsi = await ServizioCorsi.GetCorsi();
-            studenti = IdCorso!=null && Id==null ? await ServizioStudenti.GetStudentiNonIscrittiAlCorso((int)IdCorso) : await ServizioStudenti.GetStudenti();
+            studenti = IdCorso != null && Id == null ? await ServizioStudenti.GetStudentiNonIscrittiAlCorso((int)IdCorso) : await ServizioStudenti.GetStudenti();
             Iscrizione = Id == null ? new StudenteIscritto { DataIscrizione = DateTime.Now, NonAmmesso = true, VotoFinale = 0, IdCorso = (int)IdCorso } : await ServizioStudenti.GetIscrizioneById((int)Id);
         }
         else NavigationManager.NavigateTo("/");
@@ -154,9 +147,7 @@ else
     {
         if (Id == null) await ServizioStudenti.SalvaIscrizione(Iscrizione);
         await ServizioStudenti.SalvaCambiamenti();
-        StateHasChanged();
-        if (NavigationManager.Uri.Contains("/corsi/" + IdCorso + "/iscrizioni/view/" + Id)|| NavigationManager.Uri.Contains("/corsi/" + IdCorso + "/iscrizioni/create")) NavigationManager.NavigateTo("/corsi/view/" + IdCorso);
-        else NavigationManager.NavigateTo("/iscrizioni");
+        Indietro();
     }
     protected void NonAmmesso_OnChange(bool ris)
     {
@@ -165,5 +156,15 @@ else
     protected void Ritirato_OnChange(bool ris)
     {
         Iscrizione.Ritirato = ris;
+    }
+    protected async Task EliminaIscrizione(StudenteIscritto studente)
+    {
+        if (await ServizioStudenti.EliminaIscrizione(studente.Id))Indietro();
+        else AlertIscrizioni = new AlertSettings() { IsVisible = true, TypeMessage = Color.Danger, Message = $"L\'iscrizione non può essere rimossa" };
+    }
+    protected void Indietro()
+    {
+        if (System.Text.RegularExpressions.Regex.IsMatch(NavigationManager.Uri, @"/corsi/\d+/iscrizioni/view/\d+") || System.Text.RegularExpressions.Regex.IsMatch(NavigationManager.Uri, @"/corsi/\d+/iscrizioni/create")) NavigationManager.NavigateTo($"/corsi/view/{IdCorso}");
+        else NavigationManager.NavigateTo($"/iscrizioni");
     }
 }

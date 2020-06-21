@@ -1,12 +1,8 @@
-﻿@using Hackathon_Team5_19_21.Data
-@inject ApplicationDbContext db
-@inject IServizioPersonaleFitstic ServizioPersonaleFitstic
-
-<div class="modal fade" id="@Id" tabindex="-1" role="dialog" aria-hidden="true">
-    <div class="modal-dialog modal-lg" role="document">
+﻿<div class="modal fade" id="@Id" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">@Titolo</h5>
+                <h5 class="modal-title">@Titolo</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
@@ -16,7 +12,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Chiudi</button>
-                <button type="button" class="btn btn-primary" data-dismiss="modal" @onclick="OnClickSave">Salva</button>
+                <button type="button" class="btn btn-primary" data-dismiss="modal" @onclick="OnClick">@BtnText</button>
             </div>
         </div>
     </div>
@@ -30,6 +26,8 @@
     [Parameter]
     public RenderFragment ChildContent { get; set; }
     [Parameter]
-    public EventCallback<MouseEventArgs> OnClickSave { get; set; }
+    public EventCallback<MouseEventArgs> OnClick { get; set; }
+    [Parameter]
+    public string BtnText { get; set; }
 
 }

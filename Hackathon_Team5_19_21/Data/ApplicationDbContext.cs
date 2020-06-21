@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Hackathon_Team5_19_21.Data
 {
-    public class ApplicationDbContext : IdentityDbContext
+    public class ApplicationDbContext : DbContext
     {
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)
@@ -30,75 +30,75 @@ namespace Hackathon_Team5_19_21.Data
         .HasOne(p => p.Provincia)
         .WithMany(b => b.Citta)
         .HasForeignKey(p => p.IdProvincia)
-        .HasConstraintName("ForeignKey_Provincia_Citta").OnDelete(DeleteBehavior.Restrict);
+        .HasConstraintName("ForeignKey_Provincia_Citta");
 
             modelBuilder.Entity<PersonaFitstic>()
             .HasOne(p => p.Amministratore)
             .WithMany(b => b.PersonaleFistic)
             .HasForeignKey(p => p.IdAmministratore)
-            .HasConstraintName("ForeignKey_Amministratore_PersonaFitstic").OnDelete(DeleteBehavior.Restrict);
+            .HasConstraintName("ForeignKey_Amministratore_PersonaFitstic");
 
             modelBuilder.Entity<Corso>()
             .HasOne(p => p.Citta)
             .WithMany(b => b.Corsi)
             .HasForeignKey(p => p.IdCitta)
-            .HasConstraintName("ForeignKey_Corso_Citta").OnDelete(DeleteBehavior.Restrict);
+            .HasConstraintName("ForeignKey_Corso_Citta");
 
             modelBuilder.Entity<Corso>()
             .HasOne(p => p.Organizzatore)
             .WithMany(b => b.CorsiOrganizzatore)
             .HasForeignKey(p => p.IdOrganizzatore)
-            .HasConstraintName("ForeignKey_Corso_Organizzatore").OnDelete(DeleteBehavior.Restrict);
+            .HasConstraintName("ForeignKey_Corso_Organizzatore");
 
             modelBuilder.Entity<Studente>()
             .HasOne(p => p.Citta)
             .WithMany(b => b.Studenti)
             .HasForeignKey(p => p.IdCitta)
-            .HasConstraintName("ForeignKey_Studente_Citta").OnDelete(DeleteBehavior.Restrict);
+            .HasConstraintName("ForeignKey_Studente_Citta");
 
             modelBuilder.Entity<StudenteIscritto>()
             .HasOne(p => p.Studente)
             .WithMany(b => b.StudentiIscritti)
             .HasForeignKey(p => p.IdStudente)
-            .HasConstraintName("ForeignKey_Studente_StudenteIscritto").OnDelete(DeleteBehavior.Restrict);
+            .HasConstraintName("ForeignKey_Studente_StudenteIscritto");
 
             modelBuilder.Entity<StudenteIscritto>()
             .HasOne(p => p.Corso)
             .WithMany(b => b.StudentiIscritti)
             .HasForeignKey(p => p.IdCorso)
-            .HasConstraintName("ForeignKey_Corso_StudenteIscritto").OnDelete(DeleteBehavior.Restrict);
+            .HasConstraintName("ForeignKey_Corso_StudenteIscritto");
 
             modelBuilder.Entity<Esame>()
             .HasOne(p => p.StudenteIscritto)
             .WithMany(b => b.Esami)
             .HasForeignKey(p => p.IdStudenteIscritto)
-            .HasConstraintName("ForeignKey_Esame_StudenteIscritto").OnDelete(DeleteBehavior.Restrict);
+            .HasConstraintName("ForeignKey_Esame_StudenteIscritto");
 
 
             modelBuilder.Entity<Esame>()
             .HasOne(p => p.Modulo)
             .WithMany(b => b.Esami)
             .HasForeignKey(p => p.IdModulo)
-            .HasConstraintName("ForeignKey_Modulo_Esame").OnDelete(DeleteBehavior.Restrict);
+            .HasConstraintName("ForeignKey_Modulo_Esame");
 
             modelBuilder.Entity<Modulo>()
             .HasOne(p => p.Corso)
             .WithMany(b => b.Moduli)
             .HasForeignKey(p => p.IdCorso)
-            .HasConstraintName("ForeignKey_Modulo_Corso").OnDelete(DeleteBehavior.Restrict);
+            .HasConstraintName("ForeignKey_Modulo_Corso");
 
 
             modelBuilder.Entity<Modulo>()
             .HasOne(p => p.Docente)
             .WithMany(b => b.ModuliDocente)
             .HasForeignKey(p => p.IdDocente)
-            .HasConstraintName("ForeignKey_Modulo_Docente").OnDelete(DeleteBehavior.Restrict);
+            .HasConstraintName("ForeignKey_Modulo_Docente");
 
             modelBuilder.Entity<Modulo>()
             .HasOne(p => p.Tutor)
             .WithMany(b => b.ModuliTutor)
             .HasForeignKey(p => p.IdTutor)
-            .HasConstraintName("ForeignKey_Modulo_Tutor").OnDelete(DeleteBehavior.Restrict);
+            .HasConstraintName("ForeignKey_Modulo_Tutor");
 
             modelBuilder.Entity<Amministratore>().HasIndex(x => x.Email).IsUnique();
             modelBuilder.Entity<PersonaFitstic>().HasIndex(x => x.Email).IsUnique();

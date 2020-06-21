@@ -8,151 +8,144 @@
 @inject IServizioPersonaleFitstic ServizioPersonaleFitstic
 @inject IServizioEsami ServizioEsami
 
-<h1>Moduli</h1>
+
 @if (Id == null)
 {
-    <p>Aggiungi un nuovo modulo</p>
+    <h1 class="mb-4">Aggiungi un Modulo</h1>
 }
 else
 {
-    <p>Modifica un modulo</p>
+    <h1 class="mb-4">Dettaglio Modulo</h1>
 }
 <div class="container mb-4">
+    <Alert Model="AlertModuli"></Alert>
     <EditForm Model="@Modulo" OnValidSubmit="() => Form_OnSubmit()">
         <DataAnnotationsValidator />
         <ValidationSummary />
-        <div class="input-group mb-3">
-            <div class="input-group-prepend">
-                <span class="input-group-text">Nome</span>
-            </div>
+        <InputGroup Text="Nome">
             <InputText class="form-control" @bind-Value="Modulo.Nome"></InputText>
-        </div>
-        <div class="input-group mb-3">
-            <div class="input-group-prepend">
-                <span class="input-group-text">Data Inizio</span>
-            </div>
+        </InputGroup>
+        <InputGroup Text="Data Inizio">
             <InputDate class="form-control" @bind-Value="Modulo.DataInizio"></InputDate>
-        </div>
-        <div class="input-group mb-3">
-            <div class="input-group-prepend">
-                <span class="input-group-text">Data Fine</span>
-            </div>
+        </InputGroup>
+        <InputGroup Text="Data Fine">
             <InputDate class="form-control" @bind-Value="Modulo.DataFine"></InputDate>
-        </div>
-        <div class="input-group mb-3">
-            <div class="input-group-prepend">
-                <span class="input-group-text">Materia</span>
-            </div>
+        </InputGroup>
+        <InputGroup Text="Materia">
             <InputText class="form-control" @bind-Value="Modulo.Materia"></InputText>
-        </div>
+        </InputGroup>
         @if (Id != null)
         {
-            <div class="input-group mb-3">
-                <div class="input-group-prepend">
-                    <label class="input-group-text">Corso</label>
-                </div>
-                <select class="custom-select" @bind="Modulo.IdCorso">
+            <InputGroup Text="Corso">
+                <InputSelectNumber class="custom-select" @bind-Value="Modulo.IdCorso">
                     @if (Id == null)
-                    {
-                        <option value="0">Seleziona un corso</option>
-                    }
+                        {
+                        <option value="">Seleziona un corso</option>
+                        }
                     @foreach (var corso in corsi)
-                    {
+                        {
                         <option value="@corso.Id">@corso.Nome @corso.AnnoInizio - @corso.AnnoFine</option>
 
-                    }
-                </select>
-            </div>
+                        }
+                </InputSelectNumber>
+            </InputGroup>
         }
-        <div class="input-group mb-3">
-            <div class="input-group-prepend">
-                <label class="input-group-text">Docente</label>
-            </div>
-            <select class="custom-select" @bind="Modulo.IdDocente">
+        <InputGroup Text="Docente">
+            <InputSelectNumber class="custom-select" @bind-Value="Modulo.IdDocente">
                 @if (Id == null)
                 {
-                    <option value="0">Seleziona un docente</option>
+                    <option value="">Seleziona un docente</option>
                 }
                 @foreach (var docente in docenti)
                 {
                     <option value="@docente.Id">@docente.Nome @docente.Cognome Nato il @docente.DataNascita.ToShortDateString() e Assunto il @docente.DataAssunzione.ToShortDateString()</option>
                 }
-            </select>
-        </div>
-        <div class="input-group mb-3">
-            <div class="input-group-prepend">
-                <label class="input-group-text">Tutor</label>
-            </div>
-            <select class="custom-select" @bind="Modulo.IdTutor">
+            </InputSelectNumber>
+        </InputGroup>
+        <InputGroup Text="Tutor">
+            <InputSelectNumber class="custom-select" @bind-Value="Modulo.IdTutor">
                 @if (Id == null)
                 {
-                    <option value="0">Seleziona un tutor</option>
+                    <option value="">Seleziona un tutor</option>
                 }
                 @foreach (var tutor in tutors)
                 {
                     <option value="@tutor.Id">@tutor.Nome @tutor.Cognome Nato il @tutor.DataNascita.ToShortDateString() e Assunto il  @tutor.DataAssunzione.ToShortDateString()</option>
                 }
-            </select>
-        </div>
-        <div class="text-right">
-            <button type="submit" class="btn btn-success">Salva</button>
+            </InputSelectNumber>
+        </InputGroup>
+        <div class="d-flex flex-column flex-md-row justify-content-end align-items-center">
+            <button type="button" class="btn btn-secondary w-100px ml-1 mt-1 mt-md-0" @onclick='()=> Indietro()'>Indietro</button>
+            @if (Id != null)
+            {
+                <button type="button" class="btn btn-danger w-100px ml-1 mt-1 mt-md-0" data-toggle="modal" data-target="#elimina-modulo">Elimina</button>
+            }
+            <button type="submit" class="btn btn-success w-100px ml-1 mt-1 mt-md-0">Salva</button>
         </div>
     </EditForm>
 </div>
+<Modal Id="elimina-modulo" BtnText="Elimina" Titolo="Elimina Modulo" OnClick="async () => await EliminaModulo(Modulo)">
+    Sei sicuro di voler eliminare il modulo @Modulo?.Nome?
+</Modal>
 @if (Id != null)
 {
     <hr />
-    <h1>Voti</h1>
-
-    <p>Visualizza i voti</p>
-
-    <div class="card shadow mb-4">
-        <div class="card-header py-3 d-flex flex-row justify-content-between align-items-center">
+    <h1 class="mb-4">Voti</h1>
+    <Alert Model="@AlertEsami"></Alert>
+    <Card>
+        <CardHeader>
             <h6 class="m-0 font-weight-bold text-primary">Voti</h6>
-        </div>
-        <div class="card-body">
-            <div class="table-responsive">
-                <table class="table table-bordered text-center">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Nome</th>
-                            <th>Cognome</th>
-                            <th>Data Nascita</th>
-                            <th>Voto</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @if (voti != null && voti.Count > 0)
-                        {
-                            @foreach (var x in voti)
+        </CardHeader>
+        <CardBody>
+            <Table Items="voti">
+                <TableHeader>
+                    <th>ID</th>
+                    <th>Nome</th>
+                    <th>Cognome</th>
+                    <th>Data Nascita</th>
+                    <th>Data Esame</th>
+                    <th>Voto</th>
+                    <th></th>
+                </TableHeader>
+                <RowTemplate>
+                    <td class="align-middle">@context.Id</td>
+                    <td class="align-middle">@context.Nome</td>
+                    <td class="align-middle">@context.Cognome</td>
+                    <td class="align-middle">@context.DataNascita.ToShortDateString()</td>
+                    <td class="align-middle">
+                        @if (context.IsEditing)
                             {
-                                <tr>
-                                    <td class="align-middle">@x.Id</td>
-                                    <td class="align-middle">@x.Nome</td>
-                                    <td class="align-middle">@x.Cognome</td>
-                                    <td class="align-middle">@x.DataNascita.ToShortDateString()</td>
-                                    @if (x.IsEditing == false)
-                                    {
-                                        <td class="align-middle" @ondblclick="() => Td_DoubleClick(x)">@x.Voto</td>
-                                    }
-                                    else
-                                    {
-                                        <td class="align-middle">
-                                            <div class="form-inline">
-                                                <input type="number" @bind="@x.Voto" class="form-control mr-1" />
-                                                <button type="button" class="btn btn-primary" @onclick="()=>Voto_Submit(x)">Salva</button>
-                                            </div>
-                                        </td>
-                                    }
-                                </tr>
+                            <input type="date" @bind="@context.DataEsame" class="form-control">
                             }
-                        }
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
+                            else
+                            {
+                            @context.DataEsame?.ToShortDateString()
+                            }
+                    </td>
+                    <td class="align-middle">
+                        @if (context.IsEditing)
+                            {
+                            <input type="number" @bind="@context.Voto" class="form-control">
+                            }
+                            else
+                            {
+                            @context.Voto
+                            }
+                    </td>
+                    <td class="align-middle">
+                        @if (context.IsEditing)
+                            {
+                            <button type="button" class="btn btn-primary" @onclick="()=>Voto_Submit(context)">Salva</button>
+                            }
+                            else
+                            {
+                            <button type="button" class="btn btn-primary" @onclick="() => { context.IsEditing = true; }">Modifica</button>
+                            }
+                    </td>
+                </RowTemplate>
+            </Table>
+        </CardBody>
+    </Card>
 }
 
 
@@ -168,6 +161,9 @@ else
     List<PersonaFitstic> docenti;
     List<PersonaFitstic> tutors;
     List<IServizioEsami.RisultatoQuery> voti;
+
+    AlertSettings AlertEsami = new AlertSettings();
+    AlertSettings AlertModuli = new AlertSettings();
 
     [CascadingParameter]
     private Task<AuthenticationState> authenticationStateTask { get; set; }
@@ -191,21 +187,28 @@ else
     {
         if (Id == null) await ServizioModuli.SalvaModulo(Modulo);
         else await ServizioModuli.SalvaCambiamenti();
-        StateHasChanged();
-        if (NavigationManager.Uri.Contains("/corsi/"+IdCorso+"/moduli/view/"+Id) || NavigationManager.Uri.Contains("/corsi/" + IdCorso + "/moduli/create")) NavigationManager.NavigateTo("/corsi/view/" + IdCorso);
-        else NavigationManager.NavigateTo("/moduli");
-    }
-    public void Td_DoubleClick(IServizioEsami.RisultatoQuery x)
-    {
-        x.IsEditing = true;
+        Indietro();
     }
     public async Task Voto_Submit(IServizioEsami.RisultatoQuery x)
     {
-        if (x.Voto >= 0 && x.Voto <= 100)
+        if (await ServizioEsami.SalvaEsame(x.Id, (int)Id, x.Voto, x.DataEsame))
         {
-            await ServizioEsami.SalvaEsame(x.Id, (int)Id, x.Voto);
             voti = await ServizioEsami.GetEsamiByIdModulo((int)Id);
             StateHasChanged();
         }
+        else AlertEsami = new AlertSettings() { IsVisible = true, TypeMessage = Color.Danger, Message = "Si è verificato durante la modifica dei dati dell\'esame. Probabilmente è stato inserito un valore non corretto." };
+    }
+    protected async Task EliminaModulo(Modulo modulo)
+    {
+        string nome = modulo.Nome;
+        if (await ServizioModuli.EliminaModulo(modulo)) Indietro();
+        else AlertModuli = new AlertSettings() { IsVisible = true, TypeMessage = Color.Danger, Message = $"Il Modulo \"{nome}\" non può essere rimosso" };
+
+
+    }
+    protected void Indietro()
+    {
+        if (System.Text.RegularExpressions.Regex.IsMatch(NavigationManager.Uri, @"/corsi/\d+/moduli/view/\d+") || System.Text.RegularExpressions.Regex.IsMatch(NavigationManager.Uri, @"/corsi/\d+/moduli/create")) NavigationManager.NavigateTo($"/corsi/view/{IdCorso}");
+        else NavigationManager.NavigateTo($"/moduli");
     }
 }

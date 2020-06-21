@@ -10,19 +10,19 @@
         <div class="text-center">
             <h1 class="h4 text-gray-900 mb-4">Login</h1>
         </div>
-        <Alert Type="Alert.TypeMessage.Danger" IsVisible="IsVisible">@LoginMessage</Alert>
-        <div class="user">
+        <Alert Model="@AlertLogin"></Alert>
+        <EditForm class="user" Model="@Utente" OnSubmit="()=>ValidateUser()">
             <div class="form-group">
-                <input type="email" class="form-control form-control-user" @bind="Email" required placeholder="Email Address...">
+                <input type="email" class="form-control form-control-user" @bind="Utente.Email" required placeholder="Email Address...">
             </div>
-            <div class="form-group">
-                <input type="password" class="form-control form-control-user" @bind="Password" required placeholder="Password">
+            <div class="form-group d-flex flex-row align-items-center">
+                <input type="@( VisualizzaPassword ? "text" : "password" )" class="form-control form-control-user pr-40px" @bind="Utente.Password" required placeholder="Password">
+                <i class="fa fa-fw @( VisualizzaPassword ? "fa-eye-slash":"fa-eye" ) field-icon ml--2" @onmouseup="() =>{ VisualizzaPassword = !VisualizzaPassword; }"></i>
             </div>
-            <button type="button" @onclick="()=>ValidateUser()" class="btn btn-primary btn-user btn-block">
+            <button type="submit" class="btn btn-primary btn-user btn-block">
                 Login
             </button>
-
-        </div>
+        </EditForm>
         <hr>
         <div class="text-center">
             <a class="small" href="recupera-password">Password dimenticata?</a>
@@ -35,42 +35,41 @@
 
 
 @code {
-    public string Email { get; set; }
-    public string Password { get; set; }
-    public string LoginMessage { get; set; }
-    public bool IsVisible { get; set; }
+    User Utente { get; set; }
+    AlertSettings AlertLogin = new AlertSettings();
 
     [CascadingParameter]
     private Task<AuthenticationState> authenticationStateTask { get; set; }
+
+    bool VisualizzaPassword { get; set; }
     protected async override Task OnInitializedAsync()
     {
         var user = (await authenticationStateTask).User;
         if (user.Identity.IsAuthenticated) NavigationManager.NavigateTo("/index");
+        Utente = new User();
     }
 
     private async Task<bool> ValidateUser()
     {
-        if (Email != "" && Email != null && Password != "" && Password != null)
+        if (Utente.Email != "" && Utente.Email != null && Utente.Password != "" && Utente.Password != null)
         {
-            var result = await ((CustomAuthenticationStateProvider)AuthenticationStateProvider).VerificaCredenziali(Email, Password);
+            var result = await ((CustomAuthenticationStateProvider)AuthenticationStateProvider).VerificaCredenziali(Utente.Email, Utente.Password);
             if (result != null)
             {
-                ((CustomAuthenticationStateProvider)AuthenticationStateProvider).MarkUserAsAuthenticated(Email);
-                await sessionStorage.SetItemAsync("email", Email);
-                await sessionStorage.SetItemAsync("admin", result);
-                NavigationManager.NavigateTo(result.PrimaPassword ? "/reimposta-password/"+Email: "/index");
+                if (result.PrimaPassword) { NavigationManager.NavigateTo("/reimposta-password/" + Utente.Email); }
+                else
+                {
+                    ((CustomAuthenticationStateProvider)AuthenticationStateProvider).MarkUserAsAuthenticated(Utente.Email);
+                    await sessionStorage.SetItemAsync("email", Utente.Email);
+                    await sessionStorage.SetItemAsync("admin", result);
+                    NavigationManager.NavigateTo("/index");
+                }
             }
-            else
-            {
-                IsVisible = true;
-                LoginMessage = "Credenziali Sbagliate";
-            }
+            else AlertLogin = new AlertSettings { IsVisible = true, Message = "Credenziali Sbagliate", TypeMessage = Color.Danger };
+
         }
-        else
-        {
-            IsVisible = true;
-            LoginMessage = "Inserire Email e Password";
-        }
+        else AlertLogin = new AlertSettings { IsVisible = true, Message = "Inserire Email e Password", TypeMessage = Color.Danger };
+
 
         return await Task.FromResult(true);
     }

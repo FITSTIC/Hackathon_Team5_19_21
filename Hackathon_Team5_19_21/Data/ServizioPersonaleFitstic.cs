@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Hackathon_Team5_19_21.Pages;
 using Hackathon_Team5_19_21.Shared;
+using Microsoft.AspNetCore.Routing.Patterns;
 using Microsoft.EntityFrameworkCore;
 
 namespace Hackathon_Team5_19_21.Data
@@ -30,17 +31,33 @@ namespace Hackathon_Team5_19_21.Data
             return await _db.PersonaleFitstic.ToListAsync();
         }
 
-        public async Task SalvaPersona(PersonaFitstic p)
+        public async Task<bool> SalvaPersona(PersonaFitstic p)
         {
-            p.Password = p.Password.Sha256();
-            await _db.PersonaleFitstic.AddAsync(p);
-            await SalvaCambiamenti();
+            bool result = false;
+            Amministratore admin = await _db.Amministratori.FindAsync(p.IdAmministratore);
+            if (admin != null)
+            {
+                p.Password = p.Password.Sha256();
+                _db.PersonaleFitstic.Add(p);
+                await _db.SaveChangesAsync();
+                result = true;
+            }
+            return result;
         }
 
-        public async Task EliminaPersona(PersonaFitstic p)
+        public async Task<bool> EliminaPersona(PersonaFitstic p)
         {
-            _db.PersonaleFitstic.Remove(p);
-            await SalvaCambiamenti();
+            bool result = false;
+            Modulo m1 = await _db.Moduli.FirstOrDefaultAsync(x => x.IdDocente == p.Id);
+            Modulo m2 = await _db.Moduli.FirstOrDefaultAsync(x => x.IdTutor == p.Id);
+            Corso c = await _db.Corsi.FirstOrDefaultAsync(x => x.IdOrganizzatore == p.Id);
+            if(m1==null && m2==null && c == null)
+            {
+                _db.PersonaleFitstic.Remove(p);
+                await _db.SaveChangesAsync();
+                result = true;
+            }
+            return result;
         }
         private async Task<List<Modulo>> GetModuliDocente(PersonaFitstic p)
         {
@@ -97,7 +114,16 @@ namespace Hackathon_Team5_19_21.Data
             p.Docente = moduliDocente.Count > 0;
             p.Tutor = moduliTutor.Count > 0;
             p.Organizzatore = corsiOrganizzatore.Count > 0;
-            await SalvaCambiamenti();
+            await _db.SaveChangesAsync();
+        }
+
+        public string Ruoli(PersonaFitstic p)
+        {
+            List<string> ruoli = new List<string>();
+            if (p.Docente) ruoli.Add("Docente");
+            if (p.Tutor) ruoli.Add("Tutor");
+            if (p.Organizzatore) ruoli.Add("Organizzatore");
+            return ruoli.Count > 0 ? string.Join(", ", ruoli) : "Nessun Ruolo";
         }
     }
 }

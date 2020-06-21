@@ -1,9 +1,3 @@
-/*(function ($) {
-    "use strict"; // Start of use strict
-
-    
-})(jQuery); // End of use strict*/
-
 $(document).ready(function () {
     // Toggle the side navigation
     $(document).on('click', "#sidebarToggle, #sidebarToggleTop", function (e) {
