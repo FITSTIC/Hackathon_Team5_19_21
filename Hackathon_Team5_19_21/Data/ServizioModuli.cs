@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Configuration;
 
 namespace Hackathon_Team5_19_21.Data
 {
@@ -22,7 +21,7 @@ namespace Hackathon_Team5_19_21.Data
             PersonaFitstic d = await _db.PersonaleFitstic.FindAsync(modulo.IdDocente);
             PersonaFitstic t = await _db.PersonaleFitstic.FindAsync(modulo.IdTutor);
             Corso c = await _db.Corsi.FindAsync(modulo.IdCorso);
-            if(d!=null && t!=null && c != null)
+            if (d != null && t != null && c != null)
             {
                 _db.Moduli.Add(modulo);
                 await _db.SaveChangesAsync();
@@ -59,7 +58,7 @@ namespace Hackathon_Team5_19_21.Data
                 result = true;
             }
             return result;
-            
+
         }
 
         public async Task<List<Modulo>> GetModuli(Corso corso)
@@ -89,7 +88,7 @@ namespace Hackathon_Team5_19_21.Data
 
         public async Task<List<Modulo>> GetModuliAttuali()
         {
-            return await _db.Moduli.Where(x => x.DataFine == null).ToListAsync();
+            return await _db.Moduli.Where(x => x.DataFine == null || x.DataFine.Value >= DateTime.Now).ToListAsync();
         }
     }
 }

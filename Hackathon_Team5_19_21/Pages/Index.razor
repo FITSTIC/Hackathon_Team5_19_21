@@ -9,16 +9,22 @@
 
 <h1 class="mb-4">Dashboard</h1>
 <div class="row">
-    <div class="col-12 col-xl-4">
+    <div class="col-12 col-md-6 col-xl-4">
         <CardDashboard Colore="Color.Primary" Icona="fa fa-users" Titolo="Totale Studenti" Testo="@ServizioStudenti.GetStudenti().Result.Count.ToString()"></CardDashboard>
+    </div>
+    <div class="col-12 col-md-6 col-xl-4">
+        <CardDashboard Colore="Color.Warning" Icona="fa fa-list-ol" Titolo="Moduli attuali" Testo="@ServizioModuli.GetModuliAttuali().Result.Count.ToString()"></CardDashboard>
+    </div>
+    <div class="col-12 col-md-6 col-xl-4">
+        <CardDashboard Colore="Color.Info" Icona="fa fa-tasks" Titolo="Esami nell'ultimo anno" Testo="@ServizioEsami.GetEsamiUltimoAnno().Result.Count.ToString()"></CardDashboard>
+    </div>
+    <div class="col-12 col-md-6 col-xl-4">
         <CardDashboard Colore="Color.Success" Icona="fa fa-list-ol" Titolo="Corsi attuali" Testo="@ServizioCorsi.GetCorsiAttuali().Result.Count.ToString()"></CardDashboard>
     </div>
-    <div class="col-12 col-xl-4">
-        <CardDashboard Colore="Color.Warning" Icona="fa fa-list-ol" Titolo="Moduli attuali" Testo="@ServizioModuli.GetModuliAttuali().Result.Count.ToString()"></CardDashboard>
+    <div class="col-12 col-md-6 col-xl-4">
         <CardDashboard Colore="Color.Danger" Icona="fa fa-list-ol" Titolo="Iscrizioni nell'ultimo anno" Testo="@ServizioStudenti.GetIscrizioniUlimoAnno().Result.Count.ToString()"></CardDashboard>
     </div>
-    <div class="col-12 col-xl-4">
-        <CardDashboard Colore="Color.Info" Icona="fa fa-tasks" Titolo="Esami nell'ultimo anno" Testo="@ServizioEsami.GetEsamiUltimoAnno().Result.Count.ToString()"></CardDashboard>
+    <div class="col-12 col-md-6 col-xl-4">
         <CardDashboard Colore="Color.Secondary" Icona="fa fa-users" Titolo="Totale Dipendenti" Testo="@ServizioPersonaleFitstic.GetPersonale().Result.Count.ToString()"></CardDashboard>
     </div>
 </div>

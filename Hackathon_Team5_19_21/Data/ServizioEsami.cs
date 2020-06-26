@@ -21,7 +21,7 @@ namespace Hackathon_Team5_19_21.Data
                                       join studenteIscritto in _db.StudentiIscritti on studente.Id equals studenteIscritto.IdStudente
                                       join esame in _db.Esami on studenteIscritto.Id equals esame.IdStudenteIscritto
                                       where studenteIscritto.Ritirato == false && studenteIscritto.NonAmmesso == false && esame.IdModulo == Id
-                                      select new IServizioEsami.RisultatoQuery { Id = studenteIscritto.Id, Nome = studente.Nome, Cognome = studente.Cognome, DataNascita = studente.DataNascita, Voto = esame.Voto, DataEsame=esame.Data, IsEditing = false }).ToListAsync();
+                                      select new IServizioEsami.RisultatoQuery { Id = studenteIscritto.Id, Nome = studente.Nome, Cognome = studente.Cognome, DataNascita = studente.DataNascita, Voto = esame.Voto, DataEsame = esame.Data, IsEditing = false }).ToListAsync();
 
             var studentiCorso = await (from studente in _db.Studenti
                                        join studenteIscritto in _db.StudentiIscritti on studente.Id equals studenteIscritto.IdStudente
@@ -48,7 +48,7 @@ namespace Hackathon_Team5_19_21.Data
             bool result = false;
             Modulo m = await _db.Moduli.FindAsync(idModulo);
             StudenteIscritto studIscr = await _db.StudentiIscritti.FindAsync(idStudIscritto);
-            if(m!=null && studIscr != null && voto>=0 && voto<=100)
+            if (m != null && studIscr != null && voto >= 0 && voto <= 100)
             {
                 var q1 = await (from studente in _db.Studenti
                                 join studenteIscritto in _db.StudentiIscritti on studente.Id equals studenteIscritto.IdStudente

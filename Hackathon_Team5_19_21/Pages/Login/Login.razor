@@ -61,7 +61,6 @@
                 {
                     ((CustomAuthenticationStateProvider)AuthenticationStateProvider).MarkUserAsAuthenticated(Utente.Email);
                     await sessionStorage.SetItemAsync("email", Utente.Email);
-                    await sessionStorage.SetItemAsync("admin", result);
                     NavigationManager.NavigateTo("/index");
                 }
             }

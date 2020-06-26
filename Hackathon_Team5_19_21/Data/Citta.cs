@@ -1,8 +1,5 @@
-using System;
 using System.Collections.Generic;
-using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 public enum Color { Danger, Warning, Success, Primary, Secondary, Info, Light, Dark }
 namespace Hackathon_Team5_19_21.Data
 {
@@ -13,12 +10,12 @@ namespace Hackathon_Team5_19_21.Data
         [Required]
         public string Nome { get; set; }
         [Required]
-        public Provincia Provincia{get;set;}
+        public Provincia Provincia { get; set; }
         [Required]
         public int? IdProvincia { get; set; }
         [Required]
-        public List<Corso> Corsi{get;set;}
+        public List<Corso> Corsi { get; set; }
         [Required]
-        public List<Studente> Studenti{get;set;}
+        public List<Studente> Studenti { get; set; }
     }
 }

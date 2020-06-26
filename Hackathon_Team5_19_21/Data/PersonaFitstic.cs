@@ -1,8 +1,6 @@
 using System;
 using System.Collections.Generic;
-using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Hackathon_Team5_19_21.Data
 {
@@ -10,7 +8,7 @@ namespace Hackathon_Team5_19_21.Data
     {
         [Key]
         public int Id { get; set; }
-        [Required(ErrorMessage ="Il Nome è obbligatorio")]
+        [Required(ErrorMessage = "Il Nome è obbligatorio")]
         public string Nome { get; set; }
         [Required(ErrorMessage = "Il Cognome è obbligatorio")]
         public string Cognome { get; set; }
@@ -33,12 +31,12 @@ namespace Hackathon_Team5_19_21.Data
         [Required]
         public bool Organizzatore { get; set; }
         [Required(ErrorMessage = "Il Telefono è obbligatorio")]
-        [MaxLength(10,ErrorMessage ="Il campo Telefono non può contenere più di 10 caratteri")]
+        [MaxLength(10, ErrorMessage = "Il campo Telefono non può contenere più di 10 caratteri")]
         public string Telefono { get; set; }
         public Amministratore Amministratore { get; set; }
         [Required]
         public int? IdAmministratore { get; set; }
-        public List<Modulo> ModuliDocente{get;set;}
+        public List<Modulo> ModuliDocente { get; set; }
         public List<Modulo> ModuliTutor { get; set; }
         public List<Corso> CorsiOrganizzatore { get; set; }
     }

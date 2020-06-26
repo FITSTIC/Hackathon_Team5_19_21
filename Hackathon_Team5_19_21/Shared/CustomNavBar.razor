@@ -1,5 +1,6 @@
 ﻿@inject Blazored.SessionStorage.ISessionStorageService sessionStorage
 @inject AuthenticationStateProvider AuthenticationStateProvider
+@inject ApplicationDbContext db
 <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
 
     <!-- Sidebar Toggle (Topbar) -->
@@ -41,7 +42,8 @@
     public string Utente { get; set; }
     protected async override Task OnInitializedAsync()
     {
-        var admin = await sessionStorage.GetItemAsync<Hackathon_Team5_19_21.Data.Amministratore>("admin");
+        string email = await sessionStorage.GetItemAsync<string>("email");
+        var admin = await db.Amministratori.FirstOrDefaultAsync(x => x.Email == email);
         Utente = admin != null ? admin.Nome + " " + admin.Cognome : "";
     }
     public async Task Logout()

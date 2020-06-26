@@ -3,34 +3,37 @@
 @inject IServizioPersonaleFitstic ServizioPersonaleFitstic
 
 <h1 class="mb-4">Personale</h1>
-<Card>
-    <CardHeader>
-        <h6 class="m-0 font-weight-bold text-primary">Personale Fitstic</h6>
-        <a href="/personale/create" class="btn btn-success">Aggiungi</a>
-    </CardHeader>
-    <CardBody>
-        <Table Items="personale">
-            <TableHeader>
-                <th>ID</th>
-                <th>Nome</th>
-                <th>Cognome</th>
-                <th>Data Nascita</th>
-                <th>Data Assunzione</th>
-                <th>Ruolo</th>
-                <th></th>
-            </TableHeader>
-            <RowTemplate>
-                <td>@context.Id</td>
-                <td>@context.Nome</td>
-                <td>@context.Cognome</td>
-                <td>@context.DataNascita.ToShortDateString()</td>
-                <td>@context.DataAssunzione.ToShortDateString()</td>
-                <td>@ServizioPersonaleFitstic.Ruoli(context)</td>
-                <td><a href="/personale/view/@context.Id" class="btn btn-primary">Dettaglio</a></td>
-            </RowTemplate>
-        </Table>
-    </CardBody>
-</Card>
+@if (personale != null)
+{
+    <Card>
+        <CardHeader>
+            <h6 class="m-0 font-weight-bold text-primary">Personale Fitstic</h6>
+            <a href="/personale/create" class="btn btn-success">Aggiungi</a>
+        </CardHeader>
+        <CardBody>
+            <Table Items="personale">
+                <TableHeader>
+                    <th>ID</th>
+                    <th>Nome</th>
+                    <th>Cognome</th>
+                    <th>Data Nascita</th>
+                    <th>Data Assunzione</th>
+                    <th>Ruolo</th>
+                    <th></th>
+                </TableHeader>
+                <RowTemplate>
+                    <td>@context.Id</td>
+                    <td>@context.Nome</td>
+                    <td>@context.Cognome</td>
+                    <td>@context.DataNascita.ToShortDateString()</td>
+                    <td>@context.DataAssunzione.ToShortDateString()</td>
+                    <td>@ServizioPersonaleFitstic.Ruoli(context)</td>
+                    <td><a href="/personale/view/@context.Id" class="btn btn-primary">Dettaglio</a></td>
+                </RowTemplate>
+            </Table>
+        </CardBody>
+    </Card>
+}
 @code {
     List<PersonaFitstic> personale;
 

@@ -5,50 +5,52 @@
 @inject IServizioCorsi ServizioCorsi
 
 <h1 class="mb-4">Moduli</h1>
-
-@foreach (var corso in corsi ?? new List<Corso>())
+@if (corsi != null)
 {
-    <Card>
-        <CardHeader>
-            <h6 class="m-0 font-weight-bold text-primary">@corso.Nome @corso.AnnoInizio - @corso.AnnoFine</h6>
-            <a href="/moduli/create/@corso.Id" class="btn btn-success">Aggiungi</a>
-        </CardHeader>
-        <CardBody>
-            <Table Items="ServizioModuli.GetModuliDelCorso(corso).Result">
-                <TableHeader>
-                    <th>ID</th>
-                    <th>Nome</th>
-                    <th>Data Inizio</th>
-                    <th>Data Fine</th>
-                    <th>Materia</th>
-                    <th>Docente</th>
-                    <th>Tutor</th>
-                    <th></th>
-                </TableHeader>
-                <RowTemplate>
-                    <td>@context.Id</td>
-                    <td>@context.Nome</td>
-                    <td>@context.DataInizio.ToShortDateString()</td>
-                    <td>@context.DataFine?.ToShortDateString()</td>
-                    <td>@context.Materia</td>
-                    @using (var docente = ServizioModuli.GetDocenteDelModulo(context))
-                        {
-                        <td>
-                            @docente.Result.Nome @docente.Result.Cognome
-                        </td>
-                        }
-                    @using (var tutor = ServizioModuli.GetTutorDelModulo(context))
-                        {
-                        <td>
-                            @tutor.Result.Nome @tutor.Result.Cognome
-                        </td>
-                        }
-                    <td><a href="/moduli/view/@context.Id" class="btn btn-primary">Dettaglio</a></td>
-                </RowTemplate>
-            </Table>
-        </CardBody>
-    </Card>
+    @foreach (var corso in corsi)
+    {
+        <Card>
+            <CardHeader>
+                <h6 class="m-0 font-weight-bold text-primary">@corso.Nome @corso.AnnoInizio - @corso.AnnoFine</h6>
+                <a href="/moduli/create/@corso.Id" class="btn btn-success">Aggiungi</a>
+            </CardHeader>
+            <CardBody>
+                <Table Items="ServizioModuli.GetModuliDelCorso(corso).Result">
+                    <TableHeader>
+                        <th>ID</th>
+                        <th>Nome</th>
+                        <th>Data Inizio</th>
+                        <th>Data Fine</th>
+                        <th>Materia</th>
+                        <th>Docente</th>
+                        <th>Tutor</th>
+                        <th></th>
+                    </TableHeader>
+                    <RowTemplate>
+                        <td>@context.Id</td>
+                        <td>@context.Nome</td>
+                        <td>@context.DataInizio.ToShortDateString()</td>
+                        <td>@context.DataFine?.ToShortDateString()</td>
+                        <td>@context.Materia</td>
+                        @using (var docente = ServizioModuli.GetDocenteDelModulo(context))
+                                {
+                            <td>
+                                @docente.Result.Nome @docente.Result.Cognome
+                            </td>
+                                }
+                        @using (var tutor = ServizioModuli.GetTutorDelModulo(context))
+                                {
+                            <td>
+                                @tutor.Result.Nome @tutor.Result.Cognome
+                            </td>
+                                }
+                        <td><a href="/moduli/view/@context.Id" class="btn btn-primary">Dettaglio</a></td>
+                    </RowTemplate>
+                </Table>
+            </CardBody>
+        </Card>
 
+    }
 }
 
 
@@ -77,6 +79,6 @@
         if (firstRender) await JSRuntime.InvokeVoidAsync("GeneraDataTable", 7);
     }
 
-    
+
 
 }

@@ -1,8 +1,5 @@
-using System;
 using System.Collections.Generic;
-using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Hackathon_Team5_19_21.Data
 {
@@ -15,6 +12,6 @@ namespace Hackathon_Team5_19_21.Data
         [Required]
         public string Sigla { get; set; }
         [Required]
-        public List<Citta> Citta {get;set;}
+        public List<Citta> Citta { get; set; }
     }
 }

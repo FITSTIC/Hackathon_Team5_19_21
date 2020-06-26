@@ -139,7 +139,7 @@ else
                             }
                             else
                             {
-                            <button type="button" class="btn btn-primary" @onclick="() => { context.IsEditing = true; }">Modifica</button>
+                            <button type="button" class="btn btn-primary" @onclick="() => { if (!IsEditing) { context.IsEditing = true; IsEditing = true; } }">Modifica</button>
                             }
                     </td>
                 </RowTemplate>
@@ -161,6 +161,8 @@ else
     List<PersonaFitstic> docenti;
     List<PersonaFitstic> tutors;
     List<IServizioEsami.RisultatoQuery> voti;
+
+    bool IsEditing { get; set; }
 
     AlertSettings AlertEsami = new AlertSettings();
     AlertSettings AlertModuli = new AlertSettings();
@@ -193,6 +195,7 @@ else
     {
         if (await ServizioEsami.SalvaEsame(x.Id, (int)Id, x.Voto, x.DataEsame))
         {
+            IsEditing = false;
             voti = await ServizioEsami.GetEsamiByIdModulo((int)Id);
             StateHasChanged();
         }

@@ -1,8 +1,5 @@
 using System;
-using System.Collections.Generic;
-using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Hackathon_Team5_19_21.Data
 {
@@ -11,10 +8,10 @@ namespace Hackathon_Team5_19_21.Data
         [Key]
         public int Id { get; set; }
         [Required]
-        [Range(0,100,ErrorMessage ="Il voto non può essere minore di 0 o maggiore di 100")]
+        [Range(0, 100, ErrorMessage = "Il voto non può essere minore di 0 o maggiore di 100")]
         public int Voto { get; set; }
         public DateTime? Data { get; set; }
-        public Modulo Modulo{get;set;}
+        public Modulo Modulo { get; set; }
         [Required]
         public int? IdModulo { get; set; }
         public StudenteIscritto StudenteIscritto { get; set; }

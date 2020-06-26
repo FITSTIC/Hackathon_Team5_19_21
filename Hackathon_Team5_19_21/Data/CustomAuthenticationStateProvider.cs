@@ -1,13 +1,9 @@
 ﻿using Blazored.SessionStorage;
+using Hackathon_Team5_19_21.Shared;
 using Microsoft.AspNetCore.Components.Authorization;
-using Microsoft.EntityFrameworkCore.Metadata;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using Hackathon_Team5_19_21.Shared;
-using Microsoft.EntityFrameworkCore;
 
 namespace Hackathon_Team5_19_21.Data
 {
@@ -37,7 +33,6 @@ namespace Hackathon_Team5_19_21.Data
         public async Task MarkUserAsLoggedout()
         {
             await _sessionStorage.RemoveItemAsync("email");
-            await _sessionStorage.RemoveItemAsync("admin");
             var identity = new ClaimsIdentity();
             var user = new ClaimsPrincipal(identity);
             NotifyAuthenticationStateChanged(Task.FromResult(new AuthenticationState(user)));

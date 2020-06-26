@@ -1,11 +1,8 @@
-﻿using System;
+﻿using Hackathon_Team5_19_21.Shared;
+using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Hackathon_Team5_19_21.Pages;
-using Hackathon_Team5_19_21.Shared;
-using Microsoft.AspNetCore.Routing.Patterns;
-using Microsoft.EntityFrameworkCore;
 
 namespace Hackathon_Team5_19_21.Data
 {
@@ -51,7 +48,7 @@ namespace Hackathon_Team5_19_21.Data
             Modulo m1 = await _db.Moduli.FirstOrDefaultAsync(x => x.IdDocente == p.Id);
             Modulo m2 = await _db.Moduli.FirstOrDefaultAsync(x => x.IdTutor == p.Id);
             Corso c = await _db.Corsi.FirstOrDefaultAsync(x => x.IdOrganizzatore == p.Id);
-            if(m1==null && m2==null && c == null)
+            if (m1 == null && m2 == null && c == null)
             {
                 _db.PersonaleFitstic.Remove(p);
                 await _db.SaveChangesAsync();
@@ -74,14 +71,14 @@ namespace Hackathon_Team5_19_21.Data
                           select modulo).ToListAsync();
         }
         private async Task<List<Corso>> GetModuliOrganizzatore(PersonaFitstic p)
-        { 
+        {
             return await (from persona in _db.PersonaleFitstic
                           join corso in _db.Corsi on persona.Id equals corso.IdOrganizzatore
                           where persona.Id == p.Id
                           select corso).ToListAsync();
         }
 
-            public async Task<bool> ControllaRuoli(PersonaFitstic p)
+        public async Task<bool> ControllaRuoli(PersonaFitstic p)
         {
             List<Modulo> moduliDocente = await GetModuliDocente(p);
             List<Modulo> moduliTutor = await GetModuliTutor(p);
@@ -97,7 +94,7 @@ namespace Hackathon_Team5_19_21.Data
 
         public async Task<Amministratore> GetAdminByEmail(string email)
         {
-            return await _db.Amministratori.FirstAsync(x=>x.Email==email);
+            return await _db.Amministratori.FirstAsync(x => x.Email == email);
         }
 
         public async Task SalvaCambiamenti()

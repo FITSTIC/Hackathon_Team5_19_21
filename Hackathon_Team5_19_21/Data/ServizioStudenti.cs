@@ -1,5 +1,4 @@
-﻿using Hackathon_Team5_19_21.Shared;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -137,7 +136,7 @@ namespace Hackathon_Team5_19_21.Data
 
         public string TipoDiplomaToString(Studente s)
         {
-            string diploma="";
+            string diploma = "";
             switch (s.TipoDiploma)
             {
                 case TipoDiploma.DiplomaMaturita:

@@ -2,7 +2,7 @@
 <CascadingAuthenticationState>
     <Router AppAssembly="@typeof(Program).Assembly">
         <Found Context="routeData">
-            @if (routeData.PageType.Name == "Login"  || routeData.PageType.Name == "ReimpostaPassword" || routeData.PageType.Name == "RecuperaPassword")
+            @if (routeData.PageType.Name == "Login" || routeData.PageType.Name == "ReimpostaPassword" || routeData.PageType.Name == "RecuperaPassword")
             {
                 <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(LoginLayout)" />
             }
@@ -12,11 +12,11 @@
             }
         </Found>
         <NotFound>
-            <LayoutView Layout="@typeof(CustomLayout)">
+            <LayoutView Layout="@typeof(Layout404)">
                 <!-- 404 Error Text -->
-                <div class="text-center">
+                <div class="text-center mt-5">
                     <div class="error mx-auto" data-text="404">404</div>
-                    <p class="lead text-gray-800 mb-5">Page Not Found</p>
+                    <p class="lead text-gray-800 mb-5">Pagina non trovata</p>
                 </div>
             </LayoutView>
         </NotFound>

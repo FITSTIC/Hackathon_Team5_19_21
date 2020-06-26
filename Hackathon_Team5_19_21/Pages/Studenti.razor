@@ -4,41 +4,42 @@
 @inject IServizioCitta ServizioCitta
 
 <h1 class="mb-4">Studenti</h1>
-<Card>
-    <CardHeader>
-        <h6 class="m-0 font-weight-bold text-primary">Studenti</h6>
-        <a href="/studenti/create" class="btn btn-success">Aggiungi</a>
-    </CardHeader>
-    <CardBody>
-        <Table Items="studenti">
-            <TableHeader>
-                <th>ID</th>
-                <th>Nome</th>
-                <th>Cognome</th>
-                <th>Data Nascita</th>
-                <th>Indirizzo</th>
-                <th>Tipo Diploma</th>
-                <th>Anno Diploma</th>
-                <th></th>
-            </TableHeader>
-            <RowTemplate>
-                <td>@context.Id</td>
-                <td>@context.Nome</td>
-                <td>@context.Cognome</td>
-                <td>@context.DataNascita.ToShortDateString()</td>
-                <td>@context.Indirizzo, @context.Civico, @ServizioCitta.GetCittaById((int)context.IdCitta).Result.Nome (@ServizioCitta.GetProvinciaByIdCitta((int)context.IdCitta).Result.Sigla)</td>
-                <td>@ServizioStudenti.TipoDiplomaToString(context)</td>
-                <td>@context.AnnoDiploma</td>
-                <td><a href="/studenti/view/@context.Id" class="btn btn-primary w-100px">Dettaglio</a></td>
-            </RowTemplate>
-        </Table>
-    </CardBody>
-</Card>
+@if (studenti != null)
+{
+    <Card>
+        <CardHeader>
+            <h6 class="m-0 font-weight-bold text-primary">Studenti</h6>
+            <a href="/studenti/create" class="btn btn-success">Aggiungi</a>
+        </CardHeader>
+        <CardBody>
+            <Table Items="studenti">
+                <TableHeader>
+                    <th>ID</th>
+                    <th>Nome</th>
+                    <th>Cognome</th>
+                    <th>Data Nascita</th>
+                    <th>Indirizzo</th>
+                    <th>Tipo Diploma</th>
+                    <th>Anno Diploma</th>
+                    <th></th>
+                </TableHeader>
+                <RowTemplate>
+                    <td>@context.Id</td>
+                    <td>@context.Nome</td>
+                    <td>@context.Cognome</td>
+                    <td>@context.DataNascita.ToShortDateString()</td>
+                    <td>@context.Indirizzo, @context.Civico, @ServizioCitta.GetCittaById((int)context.IdCitta).Result.Nome (@ServizioCitta.GetProvinciaByIdCitta((int)context.IdCitta).Result.Sigla)</td>
+                    <td>@ServizioStudenti.TipoDiplomaToString(context)</td>
+                    <td>@context.AnnoDiploma</td>
+                    <td><a href="/studenti/view/@context.Id" class="btn btn-primary w-100px">Dettaglio</a></td>
+                </RowTemplate>
+            </Table>
+        </CardBody>
+    </Card>
+}
 
 
 @code {
-    Studente StudenteSelezionato;
-
     List<Studente> studenti;
 
     [CascadingParameter]
